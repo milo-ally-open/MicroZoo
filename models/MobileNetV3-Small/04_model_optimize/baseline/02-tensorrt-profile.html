@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TensorRT 逐层性能剖析</title>
+  <style>
+    body { margin: 2rem auto; padding: 0 1rem; max-width: 1200px; color: #17202a;
+           font: 15px/1.5 system-ui, sans-serif; }
+    h1 { font-size: 1.6rem; }
+    p { color: #52616b; }
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    th, td { padding: .55rem .5rem; border-bottom: 1px solid #e5e9eb; text-align: left; }
+    thead th { position: sticky; top: 0; background: #fff; }
+    tbody th { width: 40%; font-weight: 500; overflow-wrap: anywhere; }
+    .bar-track { height: 1rem; background: #edf1f3; border-radius: .25rem; }
+    .bar { height: 100%; min-width: 2px; background: #1687a7; border-radius: .25rem; }
+    .number { width: 7rem; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    details { margin-top: 2rem; }
+    .notice { padding: .8rem 1rem; color: #704214; background: #fff4df; border-radius: .4rem; }
+    .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr)); gap: .6rem; margin: 1rem 0; }
+    .metric { padding: .7rem; background: #f5f7f8; border-radius: .4rem; }
+    .metric span { display: block; color: #52616b; font-size: .85rem; }
+    .metric strong { font-variant-numeric: tabular-nums; }
+    pre { overflow: auto; max-height: 36rem; padding: 1rem; background: #f5f7f8; border-radius: .4rem; }
+  </style>
+</head>
+<body>
+  <h1>TensorRT 逐层性能剖析</h1>
+  <p>Engine：/home/nvidia/workspace/MicroZoo/models/MobileNetV3-Small/04_model_optimize/baseline/engine/mobilenet_v3_small_fp16.engine；CPU affinity：[0, 1, 2, 3, 4, 5]；TensorRT profile 层数：113；profile 迭代数：7844；逐层平均耗时总和：1.31341 ms。</p>
+  <div class="metrics"><div class='metric'><span>Mean</span><strong>1.072 ms</strong></div><div class='metric'><span>Median</span><strong>0.957 ms</strong></div><div class='metric'><span>P90</span><strong>0.962 ms</strong></div><div class='metric'><span>P95</span><strong>1.632 ms</strong></div><div class='metric'><span>P99</span><strong>4.267 ms</strong></div></div>
+  <p class="notice">逐层剖析会增加测量开销；请用独立延迟测试记录正式性能基准。</p>
+  <p>按平均耗时从高到低排列；柱长相对最慢层归一化。逐层耗时之和不一定等于端到端延迟。</p>
+  <table>
+    <thead><tr><th>TensorRT 层</th><th>平均耗时图</th><th class="number">平均耗时</th><th class="number">中位耗时</th><th class="number">占比</th></tr></thead>
+    <tbody><tr><th scope='row'>Reformatting CopyNode for Input Tensor 0 to /features/features.0/features.0.0/Conv</th><td><div class='bar-track'><div class='bar' style='width:100.00%'></div></div></td><td class='number'>0.07264 ms</td><td class='number'>0.07050 ms</td><td class='number'>5.53%</td></tr>
+<tr><th scope='row'>__myl_MulSumAddMulAddMinMaxMul_myl109_1</th><td><div class='bar-track'><div class='bar' style='width:81.60%'></div></div></td><td class='number'>0.05927 ms</td><td class='number'>0.05955 ms</td><td class='number'>4.51%</td></tr>
+<tr><th scope='row'>/classifier/classifier_3/Gemm_myl109_2</th><td><div class='bar-track'><div class='bar' style='width:65.42%'></div></div></td><td class='number'>0.04752 ms</td><td class='number'>0.04739 ms</td><td class='number'>3.62%</td></tr>
+<tr><th scope='row'>/features/features.8/block/block.2/fc1/Conv + /features/features.8/block/block.2/activation/Relu</th><td><div class='bar-track'><div class='bar' style='width:39.90%'></div></div></td><td class='number'>0.02899 ms</td><td class='number'>0.01517 ms</td><td class='number'>2.21%</td></tr>
+<tr><th scope='row'>/features/features.10/block/block.0/block.0.0/Conv + PWN(PWN(/features/features.10/block/block.0/block.0.2/HardSwish), PWN(/features/features.10/block/block.0/block.0.2/HardSwish_13))</th><td><div class='bar-track'><div class='bar' style='width:32.95%'></div></div></td><td class='number'>0.02393 ms</td><td class='number'>0.02278 ms</td><td class='number'>1.82%</td></tr>
+<tr><th scope='row'>/features/features.4/block/block.1/block.1.0/Conv</th><td><div class='bar-track'><div class='bar' style='width:30.86%'></div></div></td><td class='number'>0.02242 ms</td><td class='number'>0.02234 ms</td><td class='number'>1.71%</td></tr>
+<tr><th scope='row'>/features/features.10/block/block.2/fc1/Conv + /features/features.10/block/block.2/activation/Relu</th><td><div class='bar-track'><div class='bar' style='width:30.42%'></div></div></td><td class='number'>0.02210 ms</td><td class='number'>0.01994 ms</td><td class='number'>1.68%</td></tr>
+<tr><th scope='row'>/features/features.2/block/block.0/block.0.0/Conv + /features/features.2/block/block.0/block.0.2/Relu</th><td><div class='bar-track'><div class='bar' style='width:30.22%'></div></div></td><td class='number'>0.02195 ms</td><td class='number'>0.02170 ms</td><td class='number'>1.67%</td></tr>
+<tr><th scope='row'>/features/features.11/block/block.2/fc1/Conv + /features/features.11/block/block.2/activation/Relu</th><td><div class='bar-track'><div class='bar' style='width:29.81%'></div></div></td><td class='number'>0.02165 ms</td><td class='number'>0.02147 ms</td><td class='number'>1.65%</td></tr>
+<tr><th scope='row'>/features/features.12/features.12.0/Conv + PWN(PWN(/features/features.12/features.12.2/HardSwish), PWN(/features/features.12/features.12.2/HardSwish_17))</th><td><div class='bar-track'><div class='bar' style='width:29.65%'></div></div></td><td class='number'>0.02154 ms</td><td class='number'>0.02086 ms</td><td class='number'>1.64%</td></tr>
+<tr><th scope='row'>/features/features.9/block/block.1/block.1.0/Conv</th><td><div class='bar-track'><div class='bar' style='width:29.49%'></div></div></td><td class='number'>0.02142 ms</td><td class='number'>0.02150 ms</td><td class='number'>1.63%</td></tr>
+<tr><th scope='row'>/features/features.11/block/block.1/block.1.0/Conv</th><td><div class='bar-track'><div class='bar' style='width:28.79%'></div></div></td><td class='number'>0.02092 ms</td><td class='number'>0.02000 ms</td><td class='number'>1.59%</td></tr>
+<tr><th scope='row'>/features/features.5/block/block.1/block.1.0/Conv</th><td><div class='bar-track'><div class='bar' style='width:28.67%'></div></div></td><td class='number'>0.02082 ms</td><td class='number'>0.02061 ms</td><td class='number'>1.59%</td></tr>
+<tr><th scope='row'>/features/features.0/features.0.0/Conv</th><td><div class='bar-track'><div class='bar' style='width:28.49%'></div></div></td><td class='number'>0.02070 ms</td><td class='number'>0.02058 ms</td><td class='number'>1.58%</td></tr>
+<tr><th scope='row'>/features/features.6/block/block.1/block.1.0/Conv</th><td><div class='bar-track'><div class='bar' style='width:28.33%'></div></div></td><td class='number'>0.02058 ms</td><td class='number'>0.01987 ms</td><td class='number'>1.57%</td></tr>
+<tr><th scope='row'>/features/features.10/block/block.3/block.3.0/Conv + /features/features.10/Add</th><td><div class='bar-track'><div class='bar' style='width:27.04%'></div></div></td><td class='number'>0.01964 ms</td><td class='number'>0.01920 ms</td><td class='number'>1.50%</td></tr>
+<tr><th scope='row'>/features/features.11/block/block.0/block.0.0/Conv + PWN(PWN(/features/features.11/block/block.0/block.0.2/HardSwish), PWN(/features/features.11/block/block.0/block.0.2/HardSwish_15))</th><td><div class='bar-track'><div class='bar' style='width:26.94%'></div></div></td><td class='number'>0.01957 ms</td><td class='number'>0.01910 ms</td><td class='number'>1.49%</td></tr>
+<tr><th scope='row'>/features/features.11/block/block.3/block.3.0/Conv + /features/features.11/Add</th><td><div class='bar-track'><div class='bar' style='width:26.94%'></div></div></td><td class='number'>0.01957 ms</td><td class='number'>0.01955 ms</td><td class='number'>1.49%</td></tr>
+<tr><th scope='row'>/features/features.8/block/block.1/block.1.0/Conv</th><td><div class='bar-track'><div class='bar' style='width:26.93%'></div></div></td><td class='number'>0.01956 ms</td><td class='number'>0.01552 ms</td><td class='number'>1.49%</td></tr>
+<tr><th scope='row'>/features/features.10/block/block.1/block.1.0/Conv</th><td><div class='bar-track'><div class='bar' style='width:25.49%'></div></div></td><td class='number'>0.01851 ms</td><td class='number'>0.01827 ms</td><td class='number'>1.41%</td></tr>
+<tr><th scope='row'>/features/features.9/block/block.3/block.3.0/Conv</th><td><div class='bar-track'><div class='bar' style='width:25.20%'></div></div></td><td class='number'>0.01830 ms</td><td class='number'>0.01818 ms</td><td class='number'>1.39%</td></tr>
+<tr><th scope='row'>/features/features.9/block/block.2/fc1/Conv + /features/features.9/block/block.2/activation/Relu</th><td><div class='bar-track'><div class='bar' style='width:25.19%'></div></div></td><td class='number'>0.01830 ms</td><td class='number'>0.01805 ms</td><td class='number'>1.39%</td></tr>
+<tr><th scope='row'>/features/features.9/block/block.0/block.0.0/Conv + PWN(PWN(/features/features.9/block/block.0/block.0.2/HardSwish), PWN(/features/features.9/block/block.0/block.0.2/HardSwish_11))</th><td><div class='bar-track'><div class='bar' style='width:24.93%'></div></div></td><td class='number'>0.01811 ms</td><td class='number'>0.01658 ms</td><td class='number'>1.38%</td></tr>
+<tr><th scope='row'>/features/features.3/block/block.1/block.1.0/Conv + /features/features.3/block/block.1/block.1.2/Relu</th><td><div class='bar-track'><div class='bar' style='width:24.66%'></div></div></td><td class='number'>0.01791 ms</td><td class='number'>0.01786 ms</td><td class='number'>1.36%</td></tr>
+<tr><th scope='row'>/features/features.8/block/block.3/block.3.0/Conv + /features/features.8/Add</th><td><div class='bar-track'><div class='bar' style='width:23.84%'></div></div></td><td class='number'>0.01732 ms</td><td class='number'>0.01734 ms</td><td class='number'>1.32%</td></tr>
+<tr><th scope='row'>/features/features.8/block/block.0/block.0.0/Conv + PWN(PWN(/features/features.8/block/block.0/block.0.2/HardSwish), PWN(/features/features.8/block/block.0/block.0.2/HardSwish_9))</th><td><div class='bar-track'><div class='bar' style='width:22.22%'></div></div></td><td class='number'>0.01614 ms</td><td class='number'>0.01309 ms</td><td class='number'>1.23%</td></tr>
+<tr><th scope='row'>/features/features.4/block/block.0/block.0.0/Conv + PWN(PWN(/features/features.4/block/block.0/block.0.2/HardSwish), PWN(/features/features.4/block/block.0/block.0.2/HardSwish_1))</th><td><div class='bar-track'><div class='bar' style='width:21.87%'></div></div></td><td class='number'>0.01589 ms</td><td class='number'>0.01581 ms</td><td class='number'>1.21%</td></tr>
+<tr><th scope='row'>PWN(PWN(/features/features.8/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.8/block/block.2/Mul))</th><td><div class='bar-track'><div class='bar' style='width:20.75%'></div></div></td><td class='number'>0.01507 ms</td><td class='number'>0.01328 ms</td><td class='number'>1.15%</td></tr>
+<tr><th scope='row'>/features/features.5/block/block.2/fc1/Conv + /features/features.5/block/block.2/activation/Relu</th><td><div class='bar-track'><div class='bar' style='width:20.41%'></div></div></td><td class='number'>0.01483 ms</td><td class='number'>0.01478 ms</td><td class='number'>1.13%</td></tr>
+<tr><th scope='row'>/features/features.7/block/block.0/block.0.0/Conv + PWN(PWN(/features/features.7/block/block.0/block.0.2/HardSwish), PWN(/features/features.7/block/block.0/block.0.2/HardSwish_7))</th><td><div class='bar-track'><div class='bar' style='width:20.37%'></div></div></td><td class='number'>0.01480 ms</td><td class='number'>0.01421 ms</td><td class='number'>1.13%</td></tr>
+<tr><th scope='row'>/features/features.7/block/block.1/block.1.0/Conv</th><td><div class='bar-track'><div class='bar' style='width:20.25%'></div></div></td><td class='number'>0.01471 ms</td><td class='number'>0.01376 ms</td><td class='number'>1.12%</td></tr>
+<tr><th scope='row'>/features/features.11/block/block.2/fc2/Conv</th><td><div class='bar-track'><div class='bar' style='width:20.06%'></div></div></td><td class='number'>0.01457 ms</td><td class='number'>0.01315 ms</td><td class='number'>1.11%</td></tr>
+<tr><th scope='row'>/features/features.1/block/block.0/block.0.0/Conv + /features/features.1/block/block.0/block.0.2/Relu</th><td><div class='bar-track'><div class='bar' style='width:20.04%'></div></div></td><td class='number'>0.01456 ms</td><td class='number'>0.01453 ms</td><td class='number'>1.11%</td></tr>
+<tr><th scope='row'>/features/features.6/block/block.2/fc1/Conv + /features/features.6/block/block.2/activation/Relu</th><td><div class='bar-track'><div class='bar' style='width:19.81%'></div></div></td><td class='number'>0.01439 ms</td><td class='number'>0.01427 ms</td><td class='number'>1.10%</td></tr>
+<tr><th scope='row'>/features/features.10/block/block.2/fc2/Conv</th><td><div class='bar-track'><div class='bar' style='width:19.76%'></div></div></td><td class='number'>0.01435 ms</td><td class='number'>0.01338 ms</td><td class='number'>1.09%</td></tr>
+<tr><th scope='row'>/features/features.9/block/block.2/fc2/Conv</th><td><div class='bar-track'><div class='bar' style='width:19.53%'></div></div></td><td class='number'>0.01419 ms</td><td class='number'>0.01363 ms</td><td class='number'>1.08%</td></tr>
+<tr><th scope='row'>/features/features.8/block/block.2/avgpool/GlobalAveragePool</th><td><div class='bar-track'><div class='bar' style='width:19.24%'></div></div></td><td class='number'>0.01397 ms</td><td class='number'>0.01002 ms</td><td class='number'>1.06%</td></tr>
+<tr><th scope='row'>/features/features.5/block/block.0/block.0.0/Conv + PWN(PWN(/features/features.5/block/block.0/block.0.2/HardSwish), PWN(/features/features.5/block/block.0/block.0.2/HardSwish_3))</th><td><div class='bar-track'><div class='bar' style='width:19.20%'></div></div></td><td class='number'>0.01394 ms</td><td class='number'>0.01405 ms</td><td class='number'>1.06%</td></tr>
+<tr><th scope='row'>/features/features.2/block/block.1/block.1.0/Conv + /features/features.2/block/block.1/block.1.2/Relu</th><td><div class='bar-track'><div class='bar' style='width:19.02%'></div></div></td><td class='number'>0.01382 ms</td><td class='number'>0.01371 ms</td><td class='number'>1.05%</td></tr>
+<tr><th scope='row'>/features/features.8/block/block.2/fc2/Conv</th><td><div class='bar-track'><div class='bar' style='width:18.84%'></div></div></td><td class='number'>0.01368 ms</td><td class='number'>0.01232 ms</td><td class='number'>1.04%</td></tr>
+<tr><th scope='row'>/features/features.3/block/block.0/block.0.0/Conv + /features/features.3/block/block.0/block.0.2/Relu</th><td><div class='bar-track'><div class='bar' style='width:18.45%'></div></div></td><td class='number'>0.01340 ms</td><td class='number'>0.01328 ms</td><td class='number'>1.02%</td></tr>
+<tr><th scope='row'>/features/features.6/block/block.0/block.0.0/Conv + PWN(PWN(/features/features.6/block/block.0/block.0.2/HardSwish), PWN(/features/features.6/block/block.0/block.0.2/HardSwish_5))</th><td><div class='bar-track'><div class='bar' style='width:18.40%'></div></div></td><td class='number'>0.01336 ms</td><td class='number'>0.01328 ms</td><td class='number'>1.02%</td></tr>
+<tr><th scope='row'>/features/features.11/block/block.2/avgpool/GlobalAveragePool</th><td><div class='bar-track'><div class='bar' style='width:18.37%'></div></div></td><td class='number'>0.01335 ms</td><td class='number'>0.01258 ms</td><td class='number'>1.02%</td></tr>
+<tr><th scope='row'>/features/features.9/block/block.2/avgpool/GlobalAveragePool</th><td><div class='bar-track'><div class='bar' style='width:18.09%'></div></div></td><td class='number'>0.01314 ms</td><td class='number'>0.01123 ms</td><td class='number'>1.00%</td></tr>
+<tr><th scope='row'>PWN(PWN(/features/features.10/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.10/block/block.2/Mul))</th><td><div class='bar-track'><div class='bar' style='width:18.08%'></div></div></td><td class='number'>0.01314 ms</td><td class='number'>0.01174 ms</td><td class='number'>1.00%</td></tr>
+<tr><th scope='row'>PWN(PWN(/features/features.11/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.11/block/block.2/Mul))</th><td><div class='bar-track'><div class='bar' style='width:18.02%'></div></div></td><td class='number'>0.01309 ms</td><td class='number'>0.01261 ms</td><td class='number'>1.00%</td></tr>
+<tr><th scope='row'>PWN(PWN(/features/features.9/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.9/block/block.2/Mul))</th><td><div class='bar-track'><div class='bar' style='width:17.11%'></div></div></td><td class='number'>0.01242 ms</td><td class='number'>0.01174 ms</td><td class='number'>0.95%</td></tr>
+<tr><th scope='row'>/features/features.7/block/block.3/block.3.0/Conv</th><td><div class='bar-track'><div class='bar' style='width:17.10%'></div></div></td><td class='number'>0.01242 ms</td><td class='number'>0.01075 ms</td><td class='number'>0.95%</td></tr>
+<tr><th scope='row'>/features/features.1/block/block.1/avgpool/GlobalAveragePool</th><td><div class='bar-track'><div class='bar' style='width:16.98%'></div></div></td><td class='number'>0.01233 ms</td><td class='number'>0.01235 ms</td><td class='number'>0.94%</td></tr>
+<tr><th scope='row'>PWN(PWN(/features/features.0/features.0.2/HardSwish), PWN(/features/features.0/features.0.2/HardSwish_0))</th><td><div class='bar-track'><div class='bar' style='width:16.69%'></div></div></td><td class='number'>0.01212 ms</td><td class='number'>0.01203 ms</td><td class='number'>0.92%</td></tr>
+<tr><th scope='row'>/features/features.5/block/block.3/block.3.0/Conv + /features/features.5/Add</th><td><div class='bar-track'><div class='bar' style='width:16.67%'></div></div></td><td class='number'>0.01211 ms</td><td class='number'>0.01206 ms</td><td class='number'>0.92%</td></tr>
+<tr><th scope='row'>/features/features.6/block/block.3/block.3.0/Conv + /features/features.6/Add</th><td><div class='bar-track'><div class='bar' style='width:16.54%'></div></div></td><td class='number'>0.01201 ms</td><td class='number'>0.01126 ms</td><td class='number'>0.91%</td></tr>
+<tr><th scope='row'>/features/features.1/block/block.2/block.2.0/Conv</th><td><div class='bar-track'><div class='bar' style='width:16.52%'></div></div></td><td class='number'>0.01200 ms</td><td class='number'>0.01187 ms</td><td class='number'>0.91%</td></tr>
+<tr><th scope='row'>/features/features.2/block/block.2/block.2.0/Conv</th><td><div class='bar-track'><div class='bar' style='width:16.39%'></div></div></td><td class='number'>0.01191 ms</td><td class='number'>0.01174 ms</td><td class='number'>0.91%</td></tr>
+<tr><th scope='row'>/features/features.3/block/block.2/block.2.0/Conv + /features/features.3/Add</th><td><div class='bar-track'><div class='bar' style='width:15.76%'></div></div></td><td class='number'>0.01145 ms</td><td class='number'>0.01146 ms</td><td class='number'>0.87%</td></tr>
+<tr><th scope='row'>/features/features.4/block/block.3/block.3.0/Conv</th><td><div class='bar-track'><div class='bar' style='width:15.16%'></div></div></td><td class='number'>0.01101 ms</td><td class='number'>0.01101 ms</td><td class='number'>0.84%</td></tr>
+<tr><th scope='row'>PWN(PWN(/features/features.1/block/block.1/scale_activation/HardSigmoid), PWN(/features/features.1/block/block.1/Mul))</th><td><div class='bar-track'><div class='bar' style='width:14.94%'></div></div></td><td class='number'>0.01085 ms</td><td class='number'>0.01053 ms</td><td class='number'>0.83%</td></tr>
+<tr><th scope='row'>/features/features.7/block/block.2/fc1/Conv + /features/features.7/block/block.2/activation/Relu</th><td><div class='bar-track'><div class='bar' style='width:14.90%'></div></div></td><td class='number'>0.01082 ms</td><td class='number'>0.00982 ms</td><td class='number'>0.82%</td></tr>
+<tr><th scope='row'>/features/features.5/block/block.2/fc2/Conv</th><td><div class='bar-track'><div class='bar' style='width:14.86%'></div></div></td><td class='number'>0.01079 ms</td><td class='number'>0.01062 ms</td><td class='number'>0.82%</td></tr>
+<tr><th scope='row'>/features/features.4/block/block.2/fc2/Conv</th><td><div class='bar-track'><div class='bar' style='width:14.63%'></div></div></td><td class='number'>0.01063 ms</td><td class='number'>0.01059 ms</td><td class='number'>0.81%</td></tr>
+<tr><th scope='row'>/features/features.7/block/block.2/fc2/Conv</th><td><div class='bar-track'><div class='bar' style='width:14.04%'></div></div></td><td class='number'>0.01020 ms</td><td class='number'>0.00870 ms</td><td class='number'>0.78%</td></tr>
+<tr><th scope='row'>/features/features.4/block/block.2/fc1/Conv + /features/features.4/block/block.2/activation/Relu</th><td><div class='bar-track'><div class='bar' style='width:13.94%'></div></div></td><td class='number'>0.01013 ms</td><td class='number'>0.01002 ms</td><td class='number'>0.77%</td></tr>
+<tr><th scope='row'>/features/features.7/block/block.2/avgpool/GlobalAveragePool</th><td><div class='bar-track'><div class='bar' style='width:13.77%'></div></div></td><td class='number'>0.01001 ms</td><td class='number'>0.00947 ms</td><td class='number'>0.76%</td></tr>
+<tr><th scope='row'>/features/features.4/block/block.2/avgpool/GlobalAveragePool</th><td><div class='bar-track'><div class='bar' style='width:13.74%'></div></div></td><td class='number'>0.00998 ms</td><td class='number'>0.00995 ms</td><td class='number'>0.76%</td></tr>
+<tr><th scope='row'>PWN(PWN(/features/features.5/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.5/block/block.2/Mul))</th><td><div class='bar-track'><div class='bar' style='width:13.63%'></div></div></td><td class='number'>0.00990 ms</td><td class='number'>0.00979 ms</td><td class='number'>0.75%</td></tr>
+<tr><th scope='row'>/features/features.5/block/block.2/avgpool/GlobalAveragePool</th><td><div class='bar-track'><div class='bar' style='width:13.59%'></div></div></td><td class='number'>0.00987 ms</td><td class='number'>0.00970 ms</td><td class='number'>0.75%</td></tr>
+<tr><th scope='row'>/features/features.10/block/block.2/avgpool/GlobalAveragePool</th><td><div class='bar-track'><div class='bar' style='width:13.54%'></div></div></td><td class='number'>0.00983 ms</td><td class='number'>0.00931 ms</td><td class='number'>0.75%</td></tr>
+<tr><th scope='row'>/avgpool/GlobalAveragePool</th><td><div class='bar-track'><div class='bar' style='width:13.35%'></div></div></td><td class='number'>0.00970 ms</td><td class='number'>0.00934 ms</td><td class='number'>0.74%</td></tr>
+<tr><th scope='row'>PWN(PWN(/features/features.7/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.7/block/block.2/Mul))</th><td><div class='bar-track'><div class='bar' style='width:13.10%'></div></div></td><td class='number'>0.00951 ms</td><td class='number'>0.00797 ms</td><td class='number'>0.72%</td></tr>
+<tr><th scope='row'>/features/features.6/block/block.2/avgpool/GlobalAveragePool</th><td><div class='bar-track'><div class='bar' style='width:13.07%'></div></div></td><td class='number'>0.00950 ms</td><td class='number'>0.00938 ms</td><td class='number'>0.72%</td></tr>
+<tr><th scope='row'>/features/features.6/block/block.2/fc2/Conv</th><td><div class='bar-track'><div class='bar' style='width:13.02%'></div></div></td><td class='number'>0.00946 ms</td><td class='number'>0.00934 ms</td><td class='number'>0.72%</td></tr>
+<tr><th scope='row'>PWN(PWN(/features/features.6/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.6/block/block.2/Mul))</th><td><div class='bar-track'><div class='bar' style='width:13.00%'></div></div></td><td class='number'>0.00944 ms</td><td class='number'>0.00906 ms</td><td class='number'>0.72%</td></tr>
+<tr><th scope='row'>/features/features.1/block/block.1/fc2/Conv</th><td><div class='bar-track'><div class='bar' style='width:12.61%'></div></div></td><td class='number'>0.00916 ms</td><td class='number'>0.00915 ms</td><td class='number'>0.70%</td></tr>
+<tr><th scope='row'>/features/features.1/block/block.1/fc1/Conv + /features/features.1/block/block.1/activation/Relu</th><td><div class='bar-track'><div class='bar' style='width:12.57%'></div></div></td><td class='number'>0.00913 ms</td><td class='number'>0.00902 ms</td><td class='number'>0.70%</td></tr>
+<tr><th scope='row'>PWN(PWN(/features/features.4/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.4/block/block.2/Mul))</th><td><div class='bar-track'><div class='bar' style='width:12.33%'></div></div></td><td class='number'>0.00896 ms</td><td class='number'>0.00886 ms</td><td class='number'>0.68%</td></tr>
+<tr><th scope='row'>PWN(PWN(/features/features.5/block/block.1/block.1.2/HardSwish), PWN(/features/features.5/block/block.1/block.1.2/HardSwish_4))</th><td><div class='bar-track'><div class='bar' style='width:12.13%'></div></div></td><td class='number'>0.00881 ms</td><td class='number'>0.00874 ms</td><td class='number'>0.67%</td></tr>
+<tr><th scope='row'>PWN(PWN(/features/features.8/block/block.1/block.1.2/HardSwish), PWN(/features/features.8/block/block.1/block.1.2/HardSwish_10))</th><td><div class='bar-track'><div class='bar' style='width:11.77%'></div></div></td><td class='number'>0.00855 ms</td><td class='number'>0.00774 ms</td><td class='number'>0.65%</td></tr>
+<tr><th scope='row'>PWN(PWN(/features/features.10/block/block.1/block.1.2/HardSwish), PWN(/features/features.10/block/block.1/block.1.2/HardSwish_14))</th><td><div class='bar-track'><div class='bar' style='width:11.25%'></div></div></td><td class='number'>0.00817 ms</td><td class='number'>0.00806 ms</td><td class='number'>0.62%</td></tr>
+<tr><th scope='row'>PWN(PWN(/features/features.6/block/block.1/block.1.2/HardSwish), PWN(/features/features.6/block/block.1/block.1.2/HardSwish_6))</th><td><div class='bar-track'><div class='bar' style='width:11.15%'></div></div></td><td class='number'>0.00810 ms</td><td class='number'>0.00800 ms</td><td class='number'>0.62%</td></tr>
+<tr><th scope='row'>PWN(PWN(/features/features.7/block/block.1/block.1.2/HardSwish), PWN(/features/features.7/block/block.1/block.1.2/HardSwish_8))</th><td><div class='bar-track'><div class='bar' style='width:10.58%'></div></div></td><td class='number'>0.00769 ms</td><td class='number'>0.00762 ms</td><td class='number'>0.59%</td></tr>
+<tr><th scope='row'>PWN(PWN(/features/features.4/block/block.1/block.1.2/HardSwish), PWN(/features/features.4/block/block.1/block.1.2/HardSwish_2))</th><td><div class='bar-track'><div class='bar' style='width:10.39%'></div></div></td><td class='number'>0.00755 ms</td><td class='number'>0.00749 ms</td><td class='number'>0.57%</td></tr>
+<tr><th scope='row'>__myl_Cas_myl109_3</th><td><div class='bar-track'><div class='bar' style='width:10.38%'></div></div></td><td class='number'>0.00754 ms</td><td class='number'>0.00752 ms</td><td class='number'>0.57%</td></tr>
+<tr><th scope='row'>PWN(PWN(/features/features.9/block/block.1/block.1.2/HardSwish), PWN(/features/features.9/block/block.1/block.1.2/HardSwish_12))</th><td><div class='bar-track'><div class='bar' style='width:9.93%'></div></div></td><td class='number'>0.00722 ms</td><td class='number'>0.00717 ms</td><td class='number'>0.55%</td></tr>
+<tr><th scope='row'>PWN(PWN(/features/features.11/block/block.1/block.1.2/HardSwish), PWN(/features/features.11/block/block.1/block.1.2/HardSwish_16))</th><td><div class='bar-track'><div class='bar' style='width:9.75%'></div></div></td><td class='number'>0.00708 ms</td><td class='number'>0.00691 ms</td><td class='number'>0.54%</td></tr>
+<tr><th scope='row'>dummy_shape_call__mye625_0_myl109_0</th><td><div class='bar-track'><div class='bar' style='width:4.78%'></div></div></td><td class='number'>0.00347 ms</td><td class='number'>0.00368 ms</td><td class='number'>0.26%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 0 to /features/features.1/block/block.1/fc1/Conv + /features/features.1/block/block.1/activation/Relu</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 0 to PWN(PWN(/features/features.1/block/block.1/scale_activation/HardSigmoid), PWN(/features/features.1/block/block.1/Mul))</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 0 to /features/features.4/block/block.2/fc2/Conv</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 0 to PWN(PWN(/features/features.4/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.4/block/block.2/Mul))</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 1 to PWN(PWN(/features/features.4/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.4/block/block.2/Mul))</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 0 to /features/features.4/block/block.3/block.3.0/Conv</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 0 to /features/features.5/block/block.2/fc1/Conv + /features/features.5/block/block.2/activation/Relu</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 0 to PWN(PWN(/features/features.5/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.5/block/block.2/Mul))</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 1 to PWN(PWN(/features/features.5/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.5/block/block.2/Mul))</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 0 to /features/features.5/block/block.3/block.3.0/Conv + /features/features.5/Add</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 0 to /features/features.6/block/block.2/fc1/Conv + /features/features.6/block/block.2/activation/Relu</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 0 to PWN(PWN(/features/features.6/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.6/block/block.2/Mul))</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 1 to PWN(PWN(/features/features.6/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.6/block/block.2/Mul))</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 0 to /features/features.6/block/block.3/block.3.0/Conv + /features/features.6/Add</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 0 to PWN(PWN(/features/features.7/block/block.1/block.1.2/HardSwish), PWN(/features/features.7/block/block.1/block.1.2/HardSwish_8))</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Output Tensor 0 to PWN(PWN(/features/features.7/block/block.1/block.1.2/HardSwish), PWN(/features/features.7/block/block.1/block.1.2/HardSwish_8))</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 0 to PWN(PWN(/features/features.8/block/block.1/block.1.2/HardSwish), PWN(/features/features.8/block/block.1/block.1.2/HardSwish_10))</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Output Tensor 0 to PWN(PWN(/features/features.8/block/block.1/block.1.2/HardSwish), PWN(/features/features.8/block/block.1/block.1.2/HardSwish_10))</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 0 to /features/features.8/block/block.2/fc1/Conv + /features/features.8/block/block.2/activation/Relu</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 0 to /features/features.8/block/block.2/fc2/Conv</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 0 to PWN(PWN(/features/features.9/block/block.1/block.1.2/HardSwish), PWN(/features/features.9/block/block.1/block.1.2/HardSwish_12))</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Output Tensor 0 to PWN(PWN(/features/features.9/block/block.1/block.1.2/HardSwish), PWN(/features/features.9/block/block.1/block.1.2/HardSwish_12))</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 0 to /features/features.9/block/block.2/fc1/Conv + /features/features.9/block/block.2/activation/Relu</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 0 to /features/features.9/block/block.2/fc2/Conv</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 0 to /features/features.10/block/block.2/fc2/Conv</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 0 to PWN(PWN(/features/features.10/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.10/block/block.2/Mul))</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 0 to /features/features.11/block/block.2/fc2/Conv</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr>
+<tr><th scope='row'>Reformatting CopyNode for Input Tensor 0 to PWN(PWN(/features/features.11/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.11/block/block.2/Mul))</th><td><div class='bar-track'><div class='bar' style='width:0.00%'></div></div></td><td class='number'>0.00000 ms</td><td class='number'>0.00000 ms</td><td class='number'>0.00%</td></tr></tbody>
+  </table>
+  <details>
+    <summary>Engine 层信息（TensorRT exportLayerInfo）</summary>
+    <p>当前 engine 构建时使用 layer_names_only，因此 layer info 只有层名和 binding 名；若要查看算子类型、张量形状、格式和 tactic，需要以 detailed profiling verbosity 重建 engine。</p>
+    <pre>{
+  &quot;Layers&quot;: [
+    &quot;Reformatting CopyNode for Input Tensor 0 to /features/features.0/features.0.0/Conv&quot;,
+    &quot;/features/features.0/features.0.0/Conv&quot;,
+    &quot;PWN(PWN(/features/features.0/features.0.2/HardSwish), PWN(/features/features.0/features.0.2/HardSwish_0))&quot;,
+    &quot;/features/features.1/block/block.0/block.0.0/Conv + /features/features.1/block/block.0/block.0.2/Relu&quot;,
+    &quot;/features/features.1/block/block.1/avgpool/GlobalAveragePool&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 0 to /features/features.1/block/block.1/fc1/Conv + /features/features.1/block/block.1/activation/Relu&quot;,
+    &quot;/features/features.1/block/block.1/fc1/Conv + /features/features.1/block/block.1/activation/Relu&quot;,
+    &quot;/features/features.1/block/block.1/fc2/Conv&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 0 to PWN(PWN(/features/features.1/block/block.1/scale_activation/HardSigmoid), PWN(/features/features.1/block/block.1/Mul))&quot;,
+    &quot;PWN(PWN(/features/features.1/block/block.1/scale_activation/HardSigmoid), PWN(/features/features.1/block/block.1/Mul))&quot;,
+    &quot;/features/features.1/block/block.2/block.2.0/Conv&quot;,
+    &quot;/features/features.2/block/block.0/block.0.0/Conv + /features/features.2/block/block.0/block.0.2/Relu&quot;,
+    &quot;/features/features.2/block/block.1/block.1.0/Conv + /features/features.2/block/block.1/block.1.2/Relu&quot;,
+    &quot;/features/features.2/block/block.2/block.2.0/Conv&quot;,
+    &quot;/features/features.3/block/block.0/block.0.0/Conv + /features/features.3/block/block.0/block.0.2/Relu&quot;,
+    &quot;/features/features.3/block/block.1/block.1.0/Conv + /features/features.3/block/block.1/block.1.2/Relu&quot;,
+    &quot;/features/features.3/block/block.2/block.2.0/Conv + /features/features.3/Add&quot;,
+    &quot;/features/features.4/block/block.0/block.0.0/Conv + PWN(PWN(/features/features.4/block/block.0/block.0.2/HardSwish), PWN(/features/features.4/block/block.0/block.0.2/HardSwish_1))&quot;,
+    &quot;/features/features.4/block/block.1/block.1.0/Conv&quot;,
+    &quot;PWN(PWN(/features/features.4/block/block.1/block.1.2/HardSwish), PWN(/features/features.4/block/block.1/block.1.2/HardSwish_2))&quot;,
+    &quot;/features/features.4/block/block.2/avgpool/GlobalAveragePool&quot;,
+    &quot;/features/features.4/block/block.2/fc1/Conv + /features/features.4/block/block.2/activation/Relu&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 0 to /features/features.4/block/block.2/fc2/Conv&quot;,
+    &quot;/features/features.4/block/block.2/fc2/Conv&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 0 to PWN(PWN(/features/features.4/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.4/block/block.2/Mul))&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 1 to PWN(PWN(/features/features.4/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.4/block/block.2/Mul))&quot;,
+    &quot;PWN(PWN(/features/features.4/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.4/block/block.2/Mul))&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 0 to /features/features.4/block/block.3/block.3.0/Conv&quot;,
+    &quot;/features/features.4/block/block.3/block.3.0/Conv&quot;,
+    &quot;/features/features.5/block/block.0/block.0.0/Conv + PWN(PWN(/features/features.5/block/block.0/block.0.2/HardSwish), PWN(/features/features.5/block/block.0/block.0.2/HardSwish_3))&quot;,
+    &quot;/features/features.5/block/block.1/block.1.0/Conv&quot;,
+    &quot;PWN(PWN(/features/features.5/block/block.1/block.1.2/HardSwish), PWN(/features/features.5/block/block.1/block.1.2/HardSwish_4))&quot;,
+    &quot;/features/features.5/block/block.2/avgpool/GlobalAveragePool&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 0 to /features/features.5/block/block.2/fc1/Conv + /features/features.5/block/block.2/activation/Relu&quot;,
+    &quot;/features/features.5/block/block.2/fc1/Conv + /features/features.5/block/block.2/activation/Relu&quot;,
+    &quot;/features/features.5/block/block.2/fc2/Conv&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 0 to PWN(PWN(/features/features.5/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.5/block/block.2/Mul))&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 1 to PWN(PWN(/features/features.5/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.5/block/block.2/Mul))&quot;,
+    &quot;PWN(PWN(/features/features.5/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.5/block/block.2/Mul))&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 0 to /features/features.5/block/block.3/block.3.0/Conv + /features/features.5/Add&quot;,
+    &quot;/features/features.5/block/block.3/block.3.0/Conv + /features/features.5/Add&quot;,
+    &quot;/features/features.6/block/block.0/block.0.0/Conv + PWN(PWN(/features/features.6/block/block.0/block.0.2/HardSwish), PWN(/features/features.6/block/block.0/block.0.2/HardSwish_5))&quot;,
+    &quot;/features/features.6/block/block.1/block.1.0/Conv&quot;,
+    &quot;PWN(PWN(/features/features.6/block/block.1/block.1.2/HardSwish), PWN(/features/features.6/block/block.1/block.1.2/HardSwish_6))&quot;,
+    &quot;/features/features.6/block/block.2/avgpool/GlobalAveragePool&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 0 to /features/features.6/block/block.2/fc1/Conv + /features/features.6/block/block.2/activation/Relu&quot;,
+    &quot;/features/features.6/block/block.2/fc1/Conv + /features/features.6/block/block.2/activation/Relu&quot;,
+    &quot;/features/features.6/block/block.2/fc2/Conv&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 0 to PWN(PWN(/features/features.6/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.6/block/block.2/Mul))&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 1 to PWN(PWN(/features/features.6/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.6/block/block.2/Mul))&quot;,
+    &quot;PWN(PWN(/features/features.6/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.6/block/block.2/Mul))&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 0 to /features/features.6/block/block.3/block.3.0/Conv + /features/features.6/Add&quot;,
+    &quot;/features/features.6/block/block.3/block.3.0/Conv + /features/features.6/Add&quot;,
+    &quot;/features/features.7/block/block.0/block.0.0/Conv + PWN(PWN(/features/features.7/block/block.0/block.0.2/HardSwish), PWN(/features/features.7/block/block.0/block.0.2/HardSwish_7))&quot;,
+    &quot;/features/features.7/block/block.1/block.1.0/Conv&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 0 to PWN(PWN(/features/features.7/block/block.1/block.1.2/HardSwish), PWN(/features/features.7/block/block.1/block.1.2/HardSwish_8))&quot;,
+    &quot;PWN(PWN(/features/features.7/block/block.1/block.1.2/HardSwish), PWN(/features/features.7/block/block.1/block.1.2/HardSwish_8))&quot;,
+    &quot;Reformatting CopyNode for Output Tensor 0 to PWN(PWN(/features/features.7/block/block.1/block.1.2/HardSwish), PWN(/features/features.7/block/block.1/block.1.2/HardSwish_8))&quot;,
+    &quot;/features/features.7/block/block.2/avgpool/GlobalAveragePool&quot;,
+    &quot;/features/features.7/block/block.2/fc1/Conv + /features/features.7/block/block.2/activation/Relu&quot;,
+    &quot;/features/features.7/block/block.2/fc2/Conv&quot;,
+    &quot;PWN(PWN(/features/features.7/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.7/block/block.2/Mul))&quot;,
+    &quot;/features/features.7/block/block.3/block.3.0/Conv&quot;,
+    &quot;/features/features.8/block/block.0/block.0.0/Conv + PWN(PWN(/features/features.8/block/block.0/block.0.2/HardSwish), PWN(/features/features.8/block/block.0/block.0.2/HardSwish_9))&quot;,
+    &quot;/features/features.8/block/block.1/block.1.0/Conv&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 0 to PWN(PWN(/features/features.8/block/block.1/block.1.2/HardSwish), PWN(/features/features.8/block/block.1/block.1.2/HardSwish_10))&quot;,
+    &quot;PWN(PWN(/features/features.8/block/block.1/block.1.2/HardSwish), PWN(/features/features.8/block/block.1/block.1.2/HardSwish_10))&quot;,
+    &quot;Reformatting CopyNode for Output Tensor 0 to PWN(PWN(/features/features.8/block/block.1/block.1.2/HardSwish), PWN(/features/features.8/block/block.1/block.1.2/HardSwish_10))&quot;,
+    &quot;/features/features.8/block/block.2/avgpool/GlobalAveragePool&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 0 to /features/features.8/block/block.2/fc1/Conv + /features/features.8/block/block.2/activation/Relu&quot;,
+    &quot;/features/features.8/block/block.2/fc1/Conv + /features/features.8/block/block.2/activation/Relu&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 0 to /features/features.8/block/block.2/fc2/Conv&quot;,
+    &quot;/features/features.8/block/block.2/fc2/Conv&quot;,
+    &quot;PWN(PWN(/features/features.8/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.8/block/block.2/Mul))&quot;,
+    &quot;/features/features.8/block/block.3/block.3.0/Conv + /features/features.8/Add&quot;,
+    &quot;/features/features.9/block/block.0/block.0.0/Conv + PWN(PWN(/features/features.9/block/block.0/block.0.2/HardSwish), PWN(/features/features.9/block/block.0/block.0.2/HardSwish_11))&quot;,
+    &quot;/features/features.9/block/block.1/block.1.0/Conv&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 0 to PWN(PWN(/features/features.9/block/block.1/block.1.2/HardSwish), PWN(/features/features.9/block/block.1/block.1.2/HardSwish_12))&quot;,
+    &quot;PWN(PWN(/features/features.9/block/block.1/block.1.2/HardSwish), PWN(/features/features.9/block/block.1/block.1.2/HardSwish_12))&quot;,
+    &quot;Reformatting CopyNode for Output Tensor 0 to PWN(PWN(/features/features.9/block/block.1/block.1.2/HardSwish), PWN(/features/features.9/block/block.1/block.1.2/HardSwish_12))&quot;,
+    &quot;/features/features.9/block/block.2/avgpool/GlobalAveragePool&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 0 to /features/features.9/block/block.2/fc1/Conv + /features/features.9/block/block.2/activation/Relu&quot;,
+    &quot;/features/features.9/block/block.2/fc1/Conv + /features/features.9/block/block.2/activation/Relu&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 0 to /features/features.9/block/block.2/fc2/Conv&quot;,
+    &quot;/features/features.9/block/block.2/fc2/Conv&quot;,
+    &quot;PWN(PWN(/features/features.9/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.9/block/block.2/Mul))&quot;,
+    &quot;/features/features.9/block/block.3/block.3.0/Conv&quot;,
+    &quot;/features/features.10/block/block.0/block.0.0/Conv + PWN(PWN(/features/features.10/block/block.0/block.0.2/HardSwish), PWN(/features/features.10/block/block.0/block.0.2/HardSwish_13))&quot;,
+    &quot;/features/features.10/block/block.1/block.1.0/Conv&quot;,
+    &quot;PWN(PWN(/features/features.10/block/block.1/block.1.2/HardSwish), PWN(/features/features.10/block/block.1/block.1.2/HardSwish_14))&quot;,
+    &quot;/features/features.10/block/block.2/avgpool/GlobalAveragePool&quot;,
+    &quot;/features/features.10/block/block.2/fc1/Conv + /features/features.10/block/block.2/activation/Relu&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 0 to /features/features.10/block/block.2/fc2/Conv&quot;,
+    &quot;/features/features.10/block/block.2/fc2/Conv&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 0 to PWN(PWN(/features/features.10/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.10/block/block.2/Mul))&quot;,
+    &quot;PWN(PWN(/features/features.10/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.10/block/block.2/Mul))&quot;,
+    &quot;/features/features.10/block/block.3/block.3.0/Conv + /features/features.10/Add&quot;,
+    &quot;/features/features.11/block/block.0/block.0.0/Conv + PWN(PWN(/features/features.11/block/block.0/block.0.2/HardSwish), PWN(/features/features.11/block/block.0/block.0.2/HardSwish_15))&quot;,
+    &quot;/features/features.11/block/block.1/block.1.0/Conv&quot;,
+    &quot;PWN(PWN(/features/features.11/block/block.1/block.1.2/HardSwish), PWN(/features/features.11/block/block.1/block.1.2/HardSwish_16))&quot;,
+    &quot;/features/features.11/block/block.2/avgpool/GlobalAveragePool&quot;,
+    &quot;/features/features.11/block/block.2/fc1/Conv + /features/features.11/block/block.2/activation/Relu&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 0 to /features/features.11/block/block.2/fc2/Conv&quot;,
+    &quot;/features/features.11/block/block.2/fc2/Conv&quot;,
+    &quot;Reformatting CopyNode for Input Tensor 0 to PWN(PWN(/features/features.11/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.11/block/block.2/Mul))&quot;,
+    &quot;PWN(PWN(/features/features.11/block/block.2/scale_activation/HardSigmoid), PWN(/features/features.11/block/block.2/Mul))&quot;,
+    &quot;/features/features.11/block/block.3/block.3.0/Conv + /features/features.11/Add&quot;,
+    &quot;/features/features.12/features.12.0/Conv + PWN(PWN(/features/features.12/features.12.2/HardSwish), PWN(/features/features.12/features.12.2/HardSwish_17))&quot;,
+    &quot;/avgpool/GlobalAveragePool&quot;,
+    &quot;dummy_shape_call__mye625_0_myl109_0&quot;,
+    &quot;__myl_MulSumAddMulAddMinMaxMul_myl109_1&quot;,
+    &quot;/classifier/classifier_3/Gemm_myl109_2&quot;,
+    &quot;__myl_Cas_myl109_3&quot;
+  ],
+  &quot;Bindings&quot;: [
+    &quot;images&quot;,
+    &quot;logits&quot;
+  ]
+}</pre>
+  </details>
+</body>
+</html>
