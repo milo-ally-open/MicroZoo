@@ -1,2 +1,32 @@
 .codex/
 .vscode/
+
+# Locally downloaded checkpoints and converted deployment artifacts
+**/checkpoints/
+**/weights/
+*.pt
+*.pth
+*.onnx
+*.engine
+*.plan
+*.safetensors
+*.tflite
+*.rknn
+*.gguf
+
+# Local datasets and generated experiment outputs
+**/datasets/
+**/data/raw/
+**/data/processed/
+**/runs/
+**/outputs/
+**/logs/
+**/artifacts/
+**/calibration_cache/
+*.cache
+
+# Python local environments and bytecode
+__pycache__/
+*.py[cod]
+.venv/
+venv/
