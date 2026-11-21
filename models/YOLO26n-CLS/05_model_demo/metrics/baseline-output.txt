@@ -1,0 +1,11 @@
+[CUDA preprocessing + TensorRT]
+Result: tench (97.61%)
+Preprocess: 0.920 ms
+Inference: 1.292 ms (100-run average)
+End-to-end: 1.161 ms
+
+[OpenCV preprocessing + TensorRT]
+Result: tench (97.51%)
+Preprocess: 2.331 ms
+Inference: 1.196 ms (100-run average)
+End-to-end: 3.507 ms

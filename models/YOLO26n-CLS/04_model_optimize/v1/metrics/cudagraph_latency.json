@@ -1,0 +1,71 @@
+{
+  "model": "YOLO26n-cls TensorRT FP16",
+  "input": "/home/nvidia/workspace/MicroZoo/models/YOLO26n-CLS/04_model_optimize/baseline/sample.jpg",
+  "engine_execution_only": true,
+  "warmup_per_round": 20,
+  "iterations_per_round": 200,
+  "rounds": [
+    {
+      "repeat": 1,
+      "mode": "eager",
+      "mean_ms": 1.6668738449902776,
+      "median_ms": 1.6395879999890894,
+      "p90_ms": 1.9649868000215065,
+      "p95_ms": 2.9358991497247167,
+      "p99_ms": 4.9338444299928454,
+      "cv_percent": 48.92659916240842
+    },
+    {
+      "repeat": 1,
+      "mode": "cuda_graph",
+      "mean_ms": 1.3098877500374329,
+      "median_ms": 1.1852109998926608,
+      "p90_ms": 1.3343096999960835,
+      "p95_ms": 1.8587451501844023,
+      "p99_ms": 4.206684350074283,
+      "cv_percent": 36.3154729362187
+    },
+    {
+      "repeat": 2,
+      "mode": "eager",
+      "mean_ms": 1.8088111550036956,
+      "median_ms": 1.3475769999331533,
+      "p90_ms": 3.115627300076085,
+      "p95_ms": 3.785056349897786,
+      "p99_ms": 4.465027670021293,
+      "cv_percent": 47.57556699875806
+    },
+    {
+      "repeat": 2,
+      "mode": "cuda_graph",
+      "mean_ms": 1.231843720006509,
+      "median_ms": 0.913265999770374,
+      "p90_ms": 2.0861751999746048,
+      "p95_ms": 2.487201450253448,
+      "p99_ms": 4.127356680078265,
+      "cv_percent": 57.654318520820944
+    },
+    {
+      "repeat": 3,
+      "mode": "eager",
+      "mean_ms": 1.5070545999856222,
+      "median_ms": 1.2227980000716343,
+      "p90_ms": 2.4136036999152566,
+      "p95_ms": 2.5629993500615442,
+      "p99_ms": 4.170299619895558,
+      "cv_percent": 43.44539065728903
+    },
+    {
+      "repeat": 3,
+      "mode": "cuda_graph",
+      "mean_ms": 0.9475956199980828,
+      "median_ms": 0.8577895000598801,
+      "p90_ms": 0.9687081000720352,
+      "p95_ms": 1.8232674500723074,
+      "p99_ms": 3.0248585998651834,
+      "cv_percent": 40.96501769901269
+    }
+  ],
+  "top1_agreement": true,
+  "max_abs_output_difference": 0.0
+}

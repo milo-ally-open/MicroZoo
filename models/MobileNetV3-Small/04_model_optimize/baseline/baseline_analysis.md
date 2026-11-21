@@ -88,7 +88,7 @@ tensorboard --logdir=profiling
 4. **先把基准稳定下来。** 当前 eager 和 CUDA Graph 的 P95 / P99 与中位数差距很大，且 CV 分别为 41.8% / 57.9%。保持设备温度、后台负载和输入 shape 一致，延长测量时间并重复多轮；报告每轮的 median、P90、P95、P99 和温度 / 频率。本次命令未显式锁定 GPU 频率。
 5. **明确目标再尝试 batch 或 INT8。** batch 增大可能改善吞吐但增加排队延迟和内存；INT8 需要校准并重新做任务精度验证。当前 engine 已是 FP16，先完成 CUDA Graph 和输入格式验证，再决定是否需要这两类改动。
 
-V1 至少应包含：CUDA Graph 版本、与 baseline 相同条件的重复延迟数据，以及真实验证集上的分类精度 / 任务结果。单张 `dog.jpg` 适用于 profiling，不足以代替任务精度验证。
+V1 已在 `../v1/01-bench-cudagraph.py` 中完成同一 engine、同一张真实图片下的 eager / CUDA Graph 重复测量，并在 `../../05_model_demo/v1/` 中实现 C++ Graph replay。V1 结果和精度一致性见 [`../v1/optimization_report.md`](../v1/optimization_report.md)；100 张测试集上的模型任务精度仍以 `03_model_validate/validation_report.md` 为准，单张 `dog.jpg` 只用于 profiling 和 demo。
 
 ## TensorBoard 截图
 

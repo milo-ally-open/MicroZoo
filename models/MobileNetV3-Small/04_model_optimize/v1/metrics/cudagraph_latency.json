@@ -1,0 +1,78 @@
+{
+  "model": "MobileNetV3-Small TensorRT FP16",
+  "input": "/home/nvidia/workspace/MicroZoo/models/MobileNetV3-Small/04_model_optimize/baseline/dog.jpg",
+  "input_shape": [
+    1,
+    3,
+    224,
+    224
+  ],
+  "batch_size": 1,
+  "engine_execution_only": true,
+  "warmup_per_round": 20,
+  "iterations_per_round": 200,
+  "rounds": [
+    {
+      "repeat": 1,
+      "mode": "eager",
+      "mean_ms": 1.5237074400283745,
+      "median_ms": 1.4939379998395452,
+      "p90_ms": 1.825241400183585,
+      "p95_ms": 2.724915049293486,
+      "p99_ms": 3.8474367507114873,
+      "cv_percent": 35.84859542124426
+    },
+    {
+      "repeat": 1,
+      "mode": "cuda_graph",
+      "mean_ms": 1.4384144899668172,
+      "median_ms": 1.1781514995163889,
+      "p90_ms": 2.36304860063683,
+      "p95_ms": 3.559543799838137,
+      "p99_ms": 4.065097959755794,
+      "cv_percent": 54.02217358819683
+    },
+    {
+      "repeat": 2,
+      "mode": "eager",
+      "mean_ms": 1.408485030024167,
+      "median_ms": 1.143638000030478,
+      "p90_ms": 2.259074299763597,
+      "p95_ms": 3.1625201008864607,
+      "p99_ms": 4.520121271107199,
+      "cv_percent": 50.63362175281642
+    },
+    {
+      "repeat": 2,
+      "mode": "cuda_graph",
+      "mean_ms": 1.1805725999511196,
+      "median_ms": 0.9315029992649215,
+      "p90_ms": 1.8749037004454294,
+      "p95_ms": 2.262743250412313,
+      "p99_ms": 3.922388660139403,
+      "cv_percent": 51.87275345928784
+    },
+    {
+      "repeat": 3,
+      "mode": "eager",
+      "mean_ms": 1.377735500000199,
+      "median_ms": 1.1005325004589395,
+      "p90_ms": 2.1554127995841554,
+      "p95_ms": 2.4796362504275584,
+      "p99_ms": 4.377696449319046,
+      "cv_percent": 51.545739770243934
+    },
+    {
+      "repeat": 3,
+      "mode": "cuda_graph",
+      "mean_ms": 1.1804644600033498,
+      "median_ms": 0.9295669997300138,
+      "p90_ms": 1.609592800377867,
+      "p95_ms": 2.378650900482164,
+      "p99_ms": 5.435591439927516,
+      "cv_percent": 73.25703240008335
+    }
+  ],
+  "top1_agreement": true,
+  "max_abs_output_difference": 0.0
+}

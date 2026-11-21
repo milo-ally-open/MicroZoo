@@ -1,0 +1,13 @@
+{
+  "model": "YOLO26n-cls",
+  "checkpoint": "checkpoints/yolo26n-cls.pt",
+  "dataset": "Imagenette2-160 deterministic 100-image subset",
+  "samples": 100,
+  "classes": 10,
+  "imgsz": 224,
+  "batch_size": 32,
+  "top1_accuracy": 0.64,
+  "top5_accuracy": 0.82,
+  "elapsed_seconds": 1.063100175000045,
+  "peak_cuda_allocated_mib": 159.3125
+}

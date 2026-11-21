@@ -1,0 +1,25 @@
+{
+  "dataset": "Imagenette2-160 deterministic 100-image subset",
+  "samples": 100,
+  "classes": 10,
+  "imgsz": 224,
+  "preprocess": "Ultralytics classify_transforms(224)",
+  "pytorch_reference": {
+    "top1_accuracy": 0.64,
+    "top5_accuracy": 0.82
+  },
+  "onnxruntime_cpu": {
+    "top1_accuracy": 0.64,
+    "top5_accuracy": 0.82
+  },
+  "tensorrt_fp16": {
+    "top1_accuracy": 0.64,
+    "top5_accuracy": 0.82
+  },
+  "delta_vs_pytorch_percentage_points": {
+    "onnx_top1": 0.0,
+    "onnx_top5": 0.0,
+    "tensorrt_top1": 0.0,
+    "tensorrt_top5": 0.0
+  }
+}
