@@ -14,8 +14,8 @@
 *.rknn
 *.gguf
 
-# Required runtime asset for the self-contained MobileNetV3-Small demo.
-!models/MobileNetV3-Small/05_model_demo/models/mobilenet_v3_small_fp16.engine
+# Required runtime asset for the baseline MobileNetV3-Small demo.
+!models/MobileNetV3-Small/05_model_demo/baseline/models/mobilenet_v3_small_fp16.engine
 
 # Local datasets and generated experiment outputs
 **/datasets/
