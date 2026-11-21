@@ -1,0 +1,72 @@
+{
+  "dataset": "COCO 2017 val2017 deterministic 32-image subset; smoke/regression only, not full COCO benchmark",
+  "postprocessing": "Ultralytics detection validator, confidence and IoU defaults pinned by ultralytics==8.4.155",
+  "models": {
+    "pytorch_fp32": {
+      "model_path": "01_model_train/checkpoints/yolo26n.pt",
+      "device": "Orin",
+      "dataset_images": 32,
+      "imgsz": 640,
+      "batch_size": 1,
+      "metrics": {
+        "precision": 0.6166297740879345,
+        "recall": 0.6196395448455333,
+        "map50": 0.6378301497617572,
+        "map50_95": 0.48355663707455376
+      },
+      "speed_ms_per_image": {
+        "preprocess": 1.6181064997908834,
+        "inference": 65.30757006294152,
+        "loss": 0.018302530861546984,
+        "postprocess": 3.719951718039738
+      },
+      "validation_elapsed_seconds": 5.176371385001403,
+      "peak_cuda_allocated_mib": 64.701171875,
+      "peak_cuda_reserved_mib": 88.0
+    },
+    "onnxruntime_cpu": {
+      "model_path": "03_model_validate/onnx/yolo26n.onnx",
+      "device": "CPU",
+      "dataset_images": 32,
+      "imgsz": 640,
+      "batch_size": 1,
+      "metrics": {
+        "precision": 0.650993476383544,
+        "recall": 0.5617314662208983,
+        "map50": 0.6309280851080873,
+        "map50_95": 0.4908653896786956
+      },
+      "speed_ms_per_image": {
+        "preprocess": 2.682576531015002,
+        "inference": 105.89381821841926,
+        "loss": 0.004459250249055913,
+        "postprocess": 0.5336067192729388
+      },
+      "validation_elapsed_seconds": 4.0485271959987585,
+      "peak_cuda_allocated_mib": null,
+      "peak_cuda_reserved_mib": null
+    },
+    "tensorrt_fp16": {
+      "model_path": "03_model_validate/engine/yolo26n_fp16.engine",
+      "device": "Orin",
+      "dataset_images": 32,
+      "imgsz": 640,
+      "batch_size": 1,
+      "metrics": {
+        "precision": 0.6601686670016353,
+        "recall": 0.5687822662921589,
+        "map50": 0.6267496954208857,
+        "map50_95": 0.493918667624907
+      },
+      "speed_ms_per_image": {
+        "preprocess": 1.5615273116509343,
+        "inference": 16.08256637359773,
+        "loss": 0.02274878147545678,
+        "postprocess": 1.9138537181788706
+      },
+      "validation_elapsed_seconds": 1.5266358200024115,
+      "peak_cuda_allocated_mib": 56.51171875,
+      "peak_cuda_reserved_mib": 88.0
+    }
+  }
+}

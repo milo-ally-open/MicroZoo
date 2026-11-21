@@ -1,0 +1,32 @@
+{
+  "model": "YOLO26n COCO pretrained; no project fine-tuning",
+  "checkpoint": "checkpoints/yolo26n.pt",
+  "image": "datasets/coco-val-32/images/val/000000134689.jpg",
+  "input_size": [
+    1,
+    3,
+    640,
+    640
+  ],
+  "device": "Orin",
+  "parameter_count": 2572280,
+  "checkpoint_mib": 5.287602424621582,
+  "inference_ms_20_run_average": 40.51956240000436,
+  "peak_cuda_allocated_mib": 57.693359375,
+  "peak_cuda_reserved_mib": 66.0,
+  "max_process_rss_mib": 1004.25390625,
+  "detection_count": 1,
+  "detections": [
+    {
+      "class_id": 23,
+      "class_name": "giraffe",
+      "confidence": 0.9187321662902832,
+      "xyxy": [
+        32.751800537109375,
+        76.802978515625,
+        375.6903991699219,
+        592.5828857421875
+      ]
+    }
+  ]
+}

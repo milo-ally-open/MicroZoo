@@ -1,0 +1,23 @@
+{
+  "model": "YOLO26n COCO pretrained; no project fine-tuning",
+  "checkpoint": "checkpoints/yolo26n.pt",
+  "dataset": "COCO 2017 val2017 fixed 32-image subset",
+  "dataset_yaml": "datasets/coco-val-32/data.yaml",
+  "imgsz": 640,
+  "batch_size": 1,
+  "parameter_count": 2572280,
+  "fp32_weight_estimate_mib": 9.812469482421875,
+  "fp16_weight_estimate_mib": 4.9062347412109375,
+  "checkpoint_mib": 5.287602424621582,
+  "device": "Orin",
+  "precision": "FP32 PyTorch",
+  "images": 32,
+  "metrics": {
+    "precision": 0.6166297740879345,
+    "recall": 0.6196395448455333,
+    "map50": 0.6378301497617572,
+    "map50_95": 0.48355663707455376
+  },
+  "peak_cuda_allocated_mib": 64.701171875,
+  "peak_cuda_reserved_mib": 88.0
+}
