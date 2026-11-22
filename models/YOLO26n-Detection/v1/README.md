@@ -32,7 +32,7 @@ stage 02 会导出完整 ONNX 以及用于结构学习的 backbone+Neck/head 切
 
 本版不运行性能 profiling、CUDA Graph、量化或算子优化。此阶段以后用于算子效率改进和自定义 TensorRT Plugin。
 
-## 05 构建基础 C++ Demo
+## 05 构建实时 C++ Demo
 
 ```bash
 cd models/YOLO26n-Detection/v1/05_model_demo
@@ -43,4 +43,6 @@ cmake --build build -j2
 ./build/yolo26n_demo
 ```
 
-Demo 对固定 `assets/sample.jpg` 做一次检测：OpenCV CPU 完成 letterbox，TensorRT 执行 engine，C++ 在 CPU 上进行置信度过滤和 NMS，然后打印检测框。它不依赖摄像头、用户界面或自定义 CUDA 核。engine 应在目标 Jetson/TensorRT 环境中构建。
+Demo 使用设备 `0` 的摄像头做实时检测，在窗口中绘制检测框，并每秒在窗口和终端打印 FPS。OpenCV CPU 完成 letterbox 和 NCHW 转换，TensorRT 执行 FP16 engine；CUDA kernel 完成置信度过滤、坐标还原、两两 IoU 计算、greedy class-aware NMS 和矩形边框绘制。CPU 只叠加类别文字与 FPS。按 `q` 或 `Esc` 退出。
+
+engine 必须在目标 Jetson/TensorRT 环境中构建。更换 TensorRT 版本后，先运行 `../02_model_convert/05-build_tensorrt.py` 重新构建 engine，再复制到 `05_model_demo/models/`。

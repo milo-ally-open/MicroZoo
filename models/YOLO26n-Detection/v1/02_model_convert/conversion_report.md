@@ -10,7 +10,7 @@
 
 ## 图检查
 
-`04-check_onnx.py` 使用 ONNX checker 检查完整导出图。完整 ONNX 有 445 个节点，TensorRT 解析为 515 层。输入名 `images`，输出名 `output0`。输出前驱包含检测头 TopK / GatherElements / Concat；图中没有 `NonMaxSuppression` 节点，因此 C++ demo 在 CPU 上进行置信度过滤与按类 NMS。可在 Netron 查看 `onnx/yolo26n.onnx`，检查 `images`、`output0` 和 `/model.23/` 检测头节点。
+`04-check_onnx.py` 使用 ONNX checker 检查完整导出图。完整 ONNX 有 445 个节点，TensorRT 解析为 515 层。输入名 `images`，输出名 `output0`。输出前驱包含检测头 TopK / GatherElements / Concat；图中没有 `NonMaxSuppression` 节点。v1 C++ 摄像头 demo 由 CUDA kernel 完成置信度过滤、坐标映射、两两 IoU 判断和 greedy class-aware NMS，并由 CUDA 画框 kernel 将矩形边框绘制到摄像头帧；CPU 只叠加类别文字与 FPS。可在 Netron 查看 `onnx/yolo26n.onnx`，检查 `images`、`output0` 和 `/model.23/` 检测头节点。
 
 ## Backbone/Neck 与 Detect head 切分
 
