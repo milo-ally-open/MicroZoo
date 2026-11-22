@@ -1,6 +1,6 @@
 # YOLO26n 目标检测部署流程
 
-本目录按 MicroZoo 的五阶段流程实现 D-01：官方 YOLO26n COCO 预训练模型、ONNX、Jetson TensorRT FP16、数值与任务验证、目标硬件剖析，以及 TensorRT C++ 检测 demo。
+本目录按 MicroZoo 的五阶段流程实现 D-01：官方 YOLO26n COCO 预训练模型、完整 ONNX 与 backbone+Neck / Detect head 切分 ONNX、Jetson TensorRT FP16、数值与任务验证、目标硬件剖析，以及 TensorRT C++ 检测 demo。
 
 当前使用官方预训练权重，**没有针对本项目数据微调**。32 张 COCO 2017 `val2017` 图片用于检查流程、转换回归和 demo，不是完整 COCO 验证集，不能据此宣称完整 COCO mAP。
 
@@ -20,8 +20,9 @@ python3 03-evaluate_coco_val.py
 cd ../02_model_convert
 python3 02-check_layers.py
 python3 01-export_onnx.py
-python3 03-check_onnx.py
-python3 04-build_tensorrt.py
+python3 03-onnx_slice.py
+python3 04-check_onnx.py
+python3 05-build_tensorrt.py
 
 cd ../03_model_validate
 python3 01-numerical-validate.py

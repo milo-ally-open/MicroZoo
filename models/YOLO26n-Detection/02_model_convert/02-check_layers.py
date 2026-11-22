@@ -50,3 +50,9 @@ if isinstance(output, (tuple, list)):
     print("模型输出：{}".format([tuple(value.shape) for value in output if torch.is_tensor(value)]))
 else:
     print("模型输出：{}".format(tuple(output.shape)))
+
+detect_head = network.model[-1]
+detect_inputs = detect_head.f if isinstance(detect_head.f, (list, tuple)) else [detect_head.f]
+print("Detect head 输入层：{}".format(detect_inputs))
+for index in detect_inputs:
+    print("  model[{}] 输出：{}".format(index, captured_shapes.get(index, "unknown")))
