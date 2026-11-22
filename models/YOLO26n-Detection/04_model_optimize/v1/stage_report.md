@@ -8,10 +8,10 @@
 
 ## 阶段交付物
 
-- 基线 trace、TensorRT layer profile、Nsight Systems 报告和重复测量：[`baseline/README.md`](baseline/README.md)、[`baseline/baseline_analysis.md`](baseline/baseline_analysis.md)。
-- CUDA Graph 实现、实测对照和数值一致性：[`v1/optimization_report.md`](v1/optimization_report.md)。
-- 同一 TensorRT FP16 engine 的任务精度和设备内存基准：[`../03_model_validate/validation_report.md`](../03_model_validate/validation_report.md)。V1 在固定 32 张 COCO 子集上的 eager 与 Graph engine 原始输出逐元素相同，因此任务指标维持为 Precision `0.660`、Recall `0.569`、mAP50 `0.627`、mAP50-95 `0.494`；这只是小样本回归值，不是完整 COCO 精度验收。
-- 实时摄像头部署演示：[`../05_model_demo/demo_report.md`](../05_model_demo/demo_report.md)。
+- 基线 trace、TensorRT layer profile、Nsight Systems 报告和重复测量：[`../baseline/README.md`](../baseline/README.md)、[`../baseline/baseline_analysis.md`](../baseline/baseline_analysis.md)。
+- CUDA Graph 实现、实测对照和数值一致性：[`optimization_report.md`](optimization_report.md)。
+- 同一 TensorRT FP16 engine 的任务精度和设备内存基准：[`../../03_model_validate/validation_report.md`](../../03_model_validate/validation_report.md)。V1 在固定 32 张 COCO 子集上的 eager 与 Graph engine 原始输出逐元素相同，因此任务指标维持为 Precision `0.660`、Recall `0.569`、mAP50 `0.627`、mAP50-95 `0.494`；这只是小样本回归值，不是完整 COCO 精度验收。
+- 实时摄像头部署演示：[`../../05_model_demo/baseline/demo_report.md`](../../05_model_demo/baseline/demo_report.md)。
 
 阶段 03 TensorRT FP16 的 CUDA 峰值 allocated/reserved 为 `56.5/88.0 MiB`，验证期间系统 RAM 峰值约 `5519/7620 MiB`。V1 继续使用同一 engine 与固定输入输出 buffer，增加 CUDA Graph executable；没有单独隔离其进程级内存增量，因此不把阶段 03 的数据当作 Graph 的独立内存测量。
 

@@ -48,4 +48,4 @@ cmake --build build -j2
 
 每阶段的脚本、指标和报告位于对应目录。TensorRT engine 与 checkpoint 是目标设备生成的本地二进制文件，按仓库规则忽略；demo 的运行目录要求将 stage 02 生成的 engine 复制到 `05_model_demo/baseline/models/`。
 
-阶段 04 的数据解读见 [baseline analysis](04_model_optimize/baseline/baseline_analysis.md)、[optimization report](04_model_optimize/optimization_report.md) 和 [V1 CUDA Graph report](04_model_optimize/v1/optimization_report.md)。阶段 05 的摄像头构建与实测见 [demo report](05_model_demo/demo_report.md)。
+阶段 04 的数据解读见 [baseline analysis](04_model_optimize/baseline/baseline_analysis.md)、[optimization summary](04_model_optimize/v1/stage_report.md) 和 [V1 CUDA Graph report](04_model_optimize/v1/optimization_report.md)。阶段 05 的摄像头构建与实测见 [demo report](05_model_demo/baseline/demo_report.md)。

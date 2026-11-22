@@ -69,7 +69,6 @@ cmake -S . -B build
 cmake --build build -j2
 ./build/yolo26n_cls_v1_demo
 
-cd ..
 bash 03-system-validation.sh
 python3 04-make-demo-video.py
 ```

@@ -28,4 +28,4 @@ cmake --build build -j2
 
 该 engine 在 Jetson Orin Nano Super、JetPack R36.4.3、TensorRT 10.3.0 上构建。TensorRT engine 与 ONNX 不跨设备或 TensorRT 版本保证可移植；需要在目标设备重新构建并验证。
 
-本次摄像头实时运行记录见 [demo_report.md](../demo_report.md)。
+本次摄像头实时运行记录见 [demo_report.md](demo_report.md)。

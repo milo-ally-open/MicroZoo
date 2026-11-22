@@ -8,7 +8,7 @@ import numpy as np
 
 project_dir = Path(__file__).resolve().parent
 metrics_dir = project_dir / "metrics"
-sample_path = project_dir / "baseline" / "assets" / "sample.jpg"
+sample_path = project_dir / "assets" / "sample.jpg"
 video_path = project_dir / "demo.mp4"
 results = []
 
