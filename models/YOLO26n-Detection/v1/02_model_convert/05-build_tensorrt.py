@@ -11,19 +11,20 @@ engine_dir.mkdir(parents=True, exist_ok=True)
 if not onnx_path.is_file():
     raise FileNotFoundError("先运行 01-export_onnx.py")
 
-print("TensorRT：{}".format(trt.__version__), flush=True)
-print("ONNX：{} ({:.2f} MiB)".format(onnx_path, onnx_path.stat().st_size / 1024 ** 2), flush=True)
-logger = trt.Logger(trt.Logger.WARNING)
+print("TensorRT 版本：{}".format(trt.__version__), flush=True)
+print("ONNX 文件：{} ({:.2f} MiB)".format(onnx_path, onnx_path.stat().st_size / 1024 ** 2), flush=True)
+logger = trt.Logger(trt.Logger.VERBOSE)
 builder = trt.Builder(logger)
-network = builder.create_network(1 << int(trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH))
+network_flags = 1 << int(trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH)
+network = builder.create_network(network_flags)
 parser = trt.OnnxParser(network, logger)
 print("解析 ONNX...", flush=True)
 if not parser.parse_from_file(str(onnx_path)):
     for index in range(parser.num_errors):
         print(parser.get_error(index))
-    raise RuntimeError("TensorRT 无法解析 ONNX")
+    raise RuntimeError("TensorRT 无法解析 ONNX 模型：{}".format(onnx_path))
 
-print("网络层数：{}".format(network.num_layers), flush=True)
+print("ONNX 解析完成，网络层数：{}".format(network.num_layers), flush=True)
 for index in range(network.num_inputs):
     tensor = network.get_input(index)
     print("输入 {}：shape={} dtype={}".format(tensor.name, tuple(tensor.shape), tensor.dtype), flush=True)
@@ -34,18 +35,19 @@ for index in range(network.num_outputs):
 config = builder.create_builder_config()
 workspace_size = 512 << 20
 config.set_memory_pool_limit(trt.MemoryPoolType.WORKSPACE, workspace_size)
-if not builder.platform_has_fast_fp16:
-    print("警告：设备未报告快速 FP16 支持，仍尝试构建 FP16 engine", flush=True)
 config.set_flag(trt.BuilderFlag.FP16)
-print("构建配置：固定 batch=1、640×640、FP16、workspace 上限 512 MiB", flush=True)
-print("开始构建 engine...", flush=True)
-started_at = perf_counter()
+print("构建配置：FP16，workspace 上限 {:.0f} MiB".format(workspace_size / 1024 ** 2), flush=True)
+print("开始构建 engine；TensorRT 正在搜索适合本机的算子实现...", flush=True)
+build_started_at = perf_counter()
 serialized_engine = builder.build_serialized_network(network, config)
-build_seconds = perf_counter() - started_at
+build_seconds = perf_counter() - build_started_at
 if serialized_engine is None:
     raise RuntimeError("TensorRT engine 构建失败")
 
-engine_path.write_bytes(serialized_engine)
-print("Engine：{}".format(engine_path), flush=True)
-print("构建用时：{:.1f} s".format(build_seconds), flush=True)
-print("文件大小：{:.2f} MiB".format(engine_path.stat().st_size / 1024 ** 2), flush=True)
+print("Engine 构建完成，用时 {:.1f} 秒".format(build_seconds), flush=True)
+with open(engine_path, "wb") as engine_file:
+    engine_file.write(serialized_engine)
+
+print("输出摘要：YOLO26n TensorRT FP16 engine", flush=True)
+print("Engine 文件：{}".format(engine_path.resolve()), flush=True)
+print("Engine 大小：{:.2f} MiB".format(engine_path.stat().st_size / 1024 ** 2), flush=True)
