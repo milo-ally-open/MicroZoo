@@ -21,6 +21,15 @@ engine_path = model_dir / "02_model_convert" / "engine" / "yolo26n-cls_fp16.engi
 profile_dir = project_dir / "profiling"
 profile_dir.mkdir(parents=True, exist_ok=True)
 
+if not torch.cuda.is_available():
+    raise RuntimeError("PyTorch 当前无法使用 CUDA，不能执行 GPU profiling")
+supported_activities = torch.profiler.supported_activities()
+print("GPU：{}".format(torch.cuda.get_device_name(0)), flush=True)
+print("PyTorch / CUDA：{} / {}".format(torch.__version__, torch.version.cuda), flush=True)
+print("Profiler 支持的活动：{}".format(supported_activities), flush=True)
+if torch.profiler.ProfilerActivity.CUDA not in supported_activities:
+    print("警告：当前 PyTorch Profiler 未报告 CUDA trace 支持；TensorBoard 可能没有 GPU kernel。", flush=True)
+
 input_tensor = classify_transforms(224)(Image.open(image_path).convert("RGB")).unsqueeze(0).cuda().half()
 model = YOLO(str(checkpoint_path), task="classify").model.cuda().half().eval()
 
@@ -54,7 +63,7 @@ if not context.set_tensor_address(input_name, int(trt_input.data_ptr())):
     raise RuntimeError("TensorRT 输入 tensor 绑定失败")
 if not context.set_tensor_address(output_name, int(trt_output.data_ptr())):
     raise RuntimeError("TensorRT 输出 tensor 绑定失败")
-stream = torch.cuda.Stream()
+stream = torch.cuda.current_stream()
 torch.cuda.synchronize()
 
 for _ in range(10):
@@ -72,10 +81,13 @@ with torch.profiler.profile(
     on_trace_ready=torch.profiler.tensorboard_trace_handler(str(profile_dir), worker_name="TensorRT_Engine"),
 ) as profiler:
     for _ in range(10):
-        if not context.execute_async_v3(stream.cuda_stream):
-            raise RuntimeError("TensorRT inference 执行失败")
-        stream.synchronize()
+        with torch.profiler.record_function("TensorRT inference"):
+            if not context.execute_async_v3(stream.cuda_stream):
+                raise RuntimeError("TensorRT inference 执行失败")
+            stream.synchronize()
         profiler.step()
+print("TensorRT GPU profiling 汇总：")
+print(profiler.key_averages().table(sort_by="self_cuda_time_total", row_limit=20))
 
 with torch.profiler.profile(
     activities=[torch.profiler.ProfilerActivity.CPU, torch.profiler.ProfilerActivity.CUDA],
@@ -84,9 +96,12 @@ with torch.profiler.profile(
 ) as profiler:
     with torch.inference_mode():
         for _ in range(10):
-            model(input_tensor)
-            torch.cuda.synchronize()
+            with torch.profiler.record_function("PyTorch inference"):
+                model(input_tensor)
+                torch.cuda.synchronize()
             profiler.step()
+print("PyTorch GPU profiling 汇总：")
+print(profiler.key_averages().table(sort_by="self_cuda_time_total", row_limit=20))
 
 print("模型：YOLO26n-cls FP16 PyTorch 与 TensorRT")
 print("输入图像：{}；输入 shape：{}".format(image_path, tuple(input_tensor.shape)))
