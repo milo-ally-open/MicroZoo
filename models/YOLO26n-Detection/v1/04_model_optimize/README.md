@@ -13,4 +13,6 @@ tensorboard --logdir=profiling
 
 依赖：PyTorch（包含 `torch.profiler`）、`torch-tb-profiler`、`tensorboard`、Ultralytics、OpenCV 和 TensorRT。运行后，profiling trace 保存在本目录的 `profiling/` 下，该目录为本地生成物，不纳入仓库。
 
+脚本会打印 CUDA 设备、Profiler 支持的活动，以及 PyTorch 和 TensorRT 的 GPU 汇总表。如果 PyTorch 有 CUDA 时间但 TensorBoard trace 没有 GPU kernel，需检查 Jetson PyTorch 是否带有 CUPTI trace 支持及当前用户的 CUPTI 权限。
+
 当前不做量化、CUDA Graph、算子优化或自定义 TensorRT Plugin；这些工作留待后续版本。
