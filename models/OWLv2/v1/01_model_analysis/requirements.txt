@@ -1,0 +1,6 @@
+# Installed in the dedicated Conda environment by setup_conda_environment.sh.
+# Keep NVIDIA's Jetson PyTorch in system site-packages.
+transformers==4.48.3
+huggingface-hub==0.28.1
+safetensors==0.5.3
+scipy==1.15.2

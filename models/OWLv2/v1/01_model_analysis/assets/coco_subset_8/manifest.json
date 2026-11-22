@@ -1,0 +1,16 @@
+{
+  "source": "COCO 2017 val images and ground-truth boxes, copied from the locally prepared coco-val-32 subset",
+  "subset_seed": 20261121,
+  "image_ids": [
+    "000000039769",
+    "000000020571",
+    "000000032817",
+    "000000046804",
+    "000000051008",
+    "000000084270",
+    "000000280710",
+    "000000389451"
+  ],
+  "label_format": "YOLO normalized class_id center_x center_y width height; COCO-80 class order",
+  "prompt_template": "a photo of a {class_name}"
+}
