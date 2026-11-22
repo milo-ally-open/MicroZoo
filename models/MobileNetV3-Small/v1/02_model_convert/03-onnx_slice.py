@@ -2,13 +2,13 @@
 
 切分的目的，是把 通用特征提取 和 具体任务的预测 分开
 
-1. 运行 `/usr/bin/python3 models/MobileNetV3-Small/02_model_convert/02-check_layers.py`。
+1. 运行 `/usr/bin/python3 models/MobileNetV3-Small/v1/02_model_convert/02-check_layers.py`。
    检查 `features[12]` 的输出应为 `[1, 576, 7, 7]`；之后的 `avgpool`、
    `flatten` 和 `classifier` 构成分类头。
 2. 在 https://netron.app 打开 `onnx/mobilenet_v3_small.onnx`。找到全局平均池化
    节点（通常显示为 `GlobalAveragePool`），确认它的输入是 `[1, 576, 7, 7]`。
    这个输入张量就是 backbone 的输出。Netron 用于查看 ONNX 图，切分由本脚本完成。
-3. 运行 `/usr/bin/python3 models/MobileNetV3-Small/02_model_convert/03-onnx_slice.py`，
+3. 运行 `/usr/bin/python3 models/MobileNetV3-Small/v1/02_model_convert/03-onnx_slice.py`，
    导出 backbone 和分类头两个 ONNX 文件。
 4. 在 Netron 分别打开导出的文件，确认 backbone 输出和分类头输入形状一致。
    再在目标设备评估端到端延迟、内存和任务精度。
@@ -44,13 +44,15 @@ classification_head.eval()
 example_input = torch.zeros(1, 3, 224, 224, dtype=torch.float32)
 with torch.no_grad():
     backbone_features = backbone(example_input)
+    head_logits = classification_head(backbone_features)
 
-print("Backbone 输出：{}".format(tuple(backbone_features.shape)))
+backbone_onnx_path = onnx_dir / "mobilenet_v3_small_backbone.onnx"
+head_onnx_path = onnx_dir / "mobilenet_v3_small_classification_head.onnx"
 
 torch.onnx.export(
     backbone,
     example_input,
-    onnx_dir / "mobilenet_v3_small_backbone.onnx",
+    backbone_onnx_path,
     input_names=["images"],
     output_names=["features"],
     opset_version=17,
@@ -61,7 +63,7 @@ torch.onnx.export(
 torch.onnx.export(
     classification_head,
     backbone_features,
-    onnx_dir / "mobilenet_v3_small_classification_head.onnx",
+    head_onnx_path,
     input_names=["features"],
     output_names=["logits"],
     opset_version=17,
@@ -69,4 +71,8 @@ torch.onnx.export(
     dynamo=False,
 )
 
-print("Backbone 和分类头 ONNX 已导出到：{}".format(onnx_dir))
+print("切分 ONNX 导出完成")
+print("Backbone 输入/输出 shape：{} -> {}".format(tuple(example_input.shape), tuple(backbone_features.shape)))
+print("分类头输入/输出 shape：{} -> {}".format(tuple(backbone_features.shape), tuple(head_logits.shape)))
+for onnx_path in [backbone_onnx_path, head_onnx_path]:
+    print("ONNX 文件：{} ({:.2f} MiB)".format(onnx_path.resolve(), onnx_path.stat().st_size / 1024 ** 2))

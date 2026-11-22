@@ -11,9 +11,9 @@ if command -v tegrastats >/dev/null 2>&1; then
     trap 'kill "${TEGRASTATS_PID}" 2>/dev/null || true; wait "${TEGRASTATS_PID}" 2>/dev/null || true' EXIT
     python3 "${SCRIPT_DIR}/01-numerical-validate.py"
     python3 "${SCRIPT_DIR}/02-task-validate.py"
+    echo "tegrastats 内存日志：${MEMORY_DIR}/tegrastats.log"
 else
-    echo "tegrastats unavailable; running validations without system RAM sampling." >&2
+    echo "未找到 tegrastats；本次只运行数值和任务验证，不采集系统内存。" >&2
     python3 "${SCRIPT_DIR}/01-numerical-validate.py"
     python3 "${SCRIPT_DIR}/02-task-validate.py"
 fi
-echo "Validation memory log: ${MEMORY_DIR}/tegrastats.log"

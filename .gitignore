@@ -15,7 +15,7 @@
 *.gguf
 
 # Local datasets and generated experiment outputs
-models/MobileNetV3-Small/05_model_demo/v1/build/
+models/MobileNetV3-Small/v1/05_model_demo/build/
 **/datasets/
 **/data/raw/
 **/data/processed/
@@ -25,7 +25,7 @@ models/MobileNetV3-Small/05_model_demo/v1/build/
 **/artifacts/
 **/calibration_cache/
 *.cache
-# Nsight Systems regenerates SQLite analysis caches from the committed .nsys-rep files.
+# Nsight Systems regenerates SQLite analysis caches from local profiling captures.
 **/profiling/nsys/*.sqlite
 
 # Python local environments and bytecode

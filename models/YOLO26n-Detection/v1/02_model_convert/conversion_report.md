@@ -2,7 +2,7 @@
 
 ## 转换配置
 
-- 权重：`01_model_train/checkpoints/yolo26n.pt`，Ultralytics assets release `v8.4.0` 官方 COCO 检测权重。
+- 权重：`../01_model_train/checkpoints/yolo26n.pt`，Ultralytics assets release `v8.4.0` 官方 COCO 检测权重。
 - Ultralytics：`8.4.155`；ONNX：opset 17。
 - 输入：静态 `[1,3,640,640]` FP32，RGB NCHW，像素 `[0,1]`。
 - 输出：静态 `[1,300,6]` FP32；字段顺序由 end-to-end 检测头输出，验证/演示程序进一步做阈值过滤、坐标映射和 NMS。
@@ -10,7 +10,7 @@
 
 ## 图检查
 
-`04-check_onnx.py` 使用 ONNX checker 检查完整导出图。完整 ONNX 有 445 个节点，TensorRT 解析为 515 层。输入名 `images`，输出名 `output0`。输出前驱包含检测头 TopK / GatherElements / Concat；图中没有 `NonMaxSuppression` 节点，因此 C++ demo 另有 CUDA 置信度过滤与按类 NMS。可在 Netron 查看 `onnx/yolo26n.onnx`，检查 `images`、`output0` 和 `/model.23/` 检测头节点。
+`04-check_onnx.py` 使用 ONNX checker 检查完整导出图。完整 ONNX 有 445 个节点，TensorRT 解析为 515 层。输入名 `images`，输出名 `output0`。输出前驱包含检测头 TopK / GatherElements / Concat；图中没有 `NonMaxSuppression` 节点，因此 C++ demo 在 CPU 上进行置信度过滤与按类 NMS。可在 Netron 查看 `onnx/yolo26n.onnx`，检查 `images`、`output0` 和 `/model.23/` 检测头节点。
 
 ## Backbone/Neck 与 Detect head 切分
 
@@ -34,7 +34,7 @@ YOLO26n 的检测头接收三个尺度的特征图，所以不能像分类模型
 ## 复现顺序
 
 ```bash
-cd models/YOLO26n-Detection/02_model_convert
+cd models/YOLO26n-Detection/v1/02_model_convert
 python3 02-check_layers.py
 python3 01-export_onnx.py
 python3 03-onnx_slice.py

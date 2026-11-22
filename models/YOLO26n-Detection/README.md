@@ -7,7 +7,7 @@
 ## 按阶段复现
 
 ```bash
-cd models/YOLO26n-Detection/01_model_train
+cd models/YOLO26n-Detection/v1/01_model_train
 python3 01-download_weights.py
 python3 00-prepare_coco_val.py
 python3 02-run_model.py
@@ -35,9 +35,9 @@ stage 02 会导出完整 ONNX 以及用于结构学习的 backbone+Neck/head 切
 ## 05 构建基础 C++ Demo
 
 ```bash
-cd models/YOLO26n-Detection/05_model_demo/v1
+cd models/YOLO26n-Detection/v1/05_model_demo
 mkdir -p models
-cp ../../02_model_convert/engine/yolo26n_fp16.engine models/
+cp ../02_model_convert/engine/yolo26n_fp16.engine models/
 cmake -S . -B build
 cmake --build build -j2
 ./build/yolo26n_demo

@@ -2,7 +2,7 @@
 
 ## 固定条件
 
-- 原始 checkpoint：`01_model_train/checkpoints/yolo26n-cls.pt`；同一文件复制到 `02_model_convert/pt/`。
+- 原始 checkpoint：`../01_model_train/checkpoints/yolo26n-cls.pt`；同一文件复制到 `../02_model_convert/pt/`。
 - 输入：RGB FP32 NCHW，`[1, 3, 224, 224]`，Ultralytics `classify_transforms(224)`；像素在 `[0,1]`，不做 ImageNet mean/std 归一化。
 - ONNX Runtime：CPUExecutionProvider；TensorRT：Jetson 本机 FP16 engine。
 - 数值验证：本地 `sample.jpg`；对比 ONNX Runtime CPU 与 TensorRT FP16 输出，并比较 full ONNX 与 backbone/head 两段 ONNX 串接输出。
@@ -34,7 +34,7 @@ Engine 由 TensorRT 10.3.0 在目标 Jetson 上构建，完整 ONNX 和 engine �
 ## 复现命令
 
 ```bash
-cd models/YOLO26n-CLS/03_model_validate
+cd models/YOLO26n-CLS/v1/03_model_validate
 python3 01-numerical-validate.py
 python3 02-task-validate.py
 bash 03-memory-validation.sh

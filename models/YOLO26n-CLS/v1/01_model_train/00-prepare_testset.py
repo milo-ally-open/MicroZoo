@@ -34,14 +34,20 @@ for class_name in classes:
         manifest_lines.append("{}/{}".format(class_name, image_path.name))
 
 sample_image = output_dir / "n01440764" / sorted(path.name for path in (output_dir / "n01440764").iterdir())[0]
-for destination in [
+sample_destinations = [
     project_dir / "sample.jpg",
     project_dir.parent / "03_model_validate" / "sample.jpg",
-    project_dir.parent / "05_model_demo" / "v1" / "assets" / "sample.jpg",
-]:
+    project_dir.parent / "05_model_demo" / "assets" / "sample.jpg",
+]
+for destination in sample_destinations:
     destination.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(sample_image, destination)
 
-(output_dir.parent / "selection.txt").write_text("\n".join(manifest_lines) + "\n")
-print("Prepared {} images across {} classes".format(len(manifest_lines) - 1, len(classes)))
-print("Fixed sample image copied to validation and demo: {}".format(sample_image))
+manifest_path = output_dir.parent / "selection.txt"
+manifest_path.write_text("\n".join(manifest_lines) + "\n")
+print("ImageNette 固定验证子集：{} 张图片，{} 个类别".format(len(manifest_lines) - 1, len(classes)))
+print("验证集目录：{}".format(output_dir.resolve()))
+print("样本清单：{}".format(manifest_path.resolve()))
+print("固定样例来源：{}".format(sample_image.resolve()))
+for destination in sample_destinations:
+    print("固定样例副本：{}".format(destination.resolve()))

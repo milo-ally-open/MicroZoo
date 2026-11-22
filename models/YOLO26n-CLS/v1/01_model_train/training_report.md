@@ -23,7 +23,7 @@
 从仓库根目录执行：
 
 ```bash
-cd models/YOLO26n-CLS/01_model_train
+cd models/YOLO26n-CLS/v1/01_model_train
 python3 01-download_weights.py
 bash 00-download_imagenette.sh
 python3 02-run_model.py

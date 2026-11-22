@@ -14,3 +14,4 @@ tegrastats --interval 1000 --logfile "${METRICS_DIR}/tegrastats.log" &
 TEGRASTATS_PID=$!
 trap 'kill -TERM "${TEGRASTATS_PID}" 2>/dev/null || true; wait "${TEGRASTATS_PID}" 2>/dev/null || true' EXIT
 python3 "${SCRIPT_DIR}/02-task-validate.py"
+echo "tegrastats 内存日志：${METRICS_DIR}/tegrastats.log"

@@ -3,7 +3,7 @@
 ## 配置
 
 - 目标设备：NVIDIA Jetson Orin Nano Super Engineering Reference Developer Kit。
-- 验证图像：本目录中的 `dog.jpg`；训练目录 `01_model_train/dog.jpg` 保存相同副本。
+- 验证图像：本目录中的 `dog.jpg`；训练目录 `../01_model_train/dog.jpg` 保存相同副本。
 - 图像预处理：Torchvision `MobileNet_V3_Small_Weights.IMAGENET1K_V1.transforms()`。
 - 输入：FP32，NCHW，`[1, 3, 224, 224]`。
 - 对照运行时：ONNX Runtime CPU 与 TensorRT FP16。

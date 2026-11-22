@@ -49,8 +49,9 @@ if serialized_engine is None:
     raise RuntimeError("TensorRT engine 构建失败")
 
 print("Engine 构建完成，用时 {:.1f} 秒".format(build_seconds), flush=True)
-print("写入 engine：{}".format(engine_path), flush=True)
 with open(engine_path, "wb") as engine_file:
     engine_file.write(serialized_engine)
 
-print("Engine 已保存：{} ({:.2f} MiB)".format(engine_path, engine_path.stat().st_size / 1024 ** 2), flush=True)
+print("输出摘要：TensorRT FP16 engine", flush=True)
+print("Engine 文件：{}".format(engine_path.resolve()), flush=True)
+print("Engine 大小：{:.2f} MiB".format(engine_path.stat().st_size / 1024 ** 2), flush=True)

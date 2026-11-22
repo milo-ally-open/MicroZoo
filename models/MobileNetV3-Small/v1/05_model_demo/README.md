@@ -12,4 +12,4 @@ cmake --build build -j2
 ./build/mobilenet_demo
 ```
 
-程序从当前目录读取 `models/mobilenet_v3_small_fp16.engine`、`assets/dog.jpg` 和 `assets/imagenet_classes.txt`。engine 由 `02_model_convert/04-build_tensorrt.py` 从完整 ONNX 构建；不同设备或 TensorRT 版本需要重新构建。
+程序从当前目录读取 `models/mobilenet_v3_small_fp16.engine`、`assets/dog.jpg` 和 `assets/imagenet_classes.txt`。engine 由 `../02_model_convert/04-build_tensorrt.py` 从完整 ONNX 构建；不同设备或 TensorRT 版本需要重新构建。

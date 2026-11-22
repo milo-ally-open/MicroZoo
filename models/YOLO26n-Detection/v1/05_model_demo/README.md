@@ -12,4 +12,4 @@ cmake --build build -j2
 ./build/yolo26n_demo
 ```
 
-程序从当前目录读取 `models/yolo26n_fp16.engine`、`assets/sample.jpg` 和 `assets/coco_classes.txt`。engine 由阶段 02 的完整 ONNX 构建；换设备或 TensorRT 版本时应重新构建并验证。
+程序从当前目录读取 `models/yolo26n_fp16.engine`、`assets/sample.jpg` 和 `assets/coco_classes.txt`。engine 由 `../02_model_convert/05-build_tensorrt.py` 根据完整 ONNX 构建；换设备或 TensorRT 版本时应重新构建并验证。

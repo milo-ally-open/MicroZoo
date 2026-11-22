@@ -26,6 +26,7 @@ torch.onnx.export(
     dynamo=False,
 )
 
-print("ONNX 模型：{}".format(output_path))
+print("ONNX 导出完成")
+print("ONNX 文件：{} ({:.2f} MiB)".format(output_path.resolve(), output_path.stat().st_size / 1024 ** 2))
 print("输入：images，FP32，NCHW，形状 [1, 3, 224, 224]，RGB 归一化图像")
 print("输出：logits，FP32，形状 [1, 1000]，ImageNet-1K 类别分数")

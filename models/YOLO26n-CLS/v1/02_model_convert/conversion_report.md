@@ -33,7 +33,7 @@ Full ONNX 大小为 11,275,222 bytes（10.75 MiB），由 Ultralytics 8.4.155 �
 ## 复现命令
 
 ```bash
-cd models/YOLO26n-CLS/02_model_convert
+cd models/YOLO26n-CLS/v1/02_model_convert
 python3 01-export_onnx.py
 python3 02-check_layers.py
 python3 03-onnx_slice.py
