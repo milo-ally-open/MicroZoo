@@ -6,11 +6,11 @@
 
 | 阶段 | 目录 | 内容 |
 |---|---|---|
-| 01 权重获取 | [`v1/01_model_train/`](v1/01_model_train/) | 下载权重、准备固定 ImageNette 样例集，运行 PyTorch 检查。此版本不训练。 |
-| 02 模型转换 | [`v1/02_model_convert/`](v1/02_model_convert/) | 导出完整 ONNX、检查层、切分 backbone/head、构建完整 TensorRT FP16 engine。 |
-| 03 模型验证 | [`v1/03_model_validate/`](v1/03_model_validate/) | 验证 ONNX 与 engine 数值和任务结果，并记录目标设备内存。 |
-| 04 模型优化 | [`v1/04_model_optimize/`](v1/04_model_optimize/) | 当前暂缓；未来用于算子效率优化与 TensorRT Plugin。 |
-| 05 端侧 Demo | [`v1/05_model_demo/`](v1/05_model_demo/) | 单张样例、OpenCV CPU 预处理和 TensorRT 分类的基础 C++ 示例。 |
+| 01 权重获取 | [`01_model_train/`](01_model_train/) | 下载权重、准备固定 ImageNette 样例集，运行 PyTorch 检查。此版本不训练。 |
+| 02 模型转换 | [`02_model_convert/`](02_model_convert/) | 导出完整 ONNX、检查层、切分 backbone/head、构建完整 TensorRT FP16 engine。 |
+| 03 模型验证 | [`03_model_validate/`](03_model_validate/) | 验证 ONNX 与 engine 数值和任务结果，并记录目标设备内存。 |
+| 04 模型优化 | [`04_model_optimize/`](04_model_optimize/) | 当前暂缓；未来用于算子效率优化与 TensorRT Plugin。 |
+| 05 端侧 Demo | [`05_model_demo/`](05_model_demo/) | 单张样例、OpenCV CPU 预处理和 TensorRT 分类的基础 C++ 示例。 |
 
 环境和依赖见 [`environment.md`](environment.md) 与 [`requirements.txt`](requirements.txt)。数据、checkpoint、ONNX 和 engine 都由脚本生成并按 `.gitignore` 保存在本地；仓库只保留复现脚本、Demo 源码和固定样例。
 
@@ -19,7 +19,7 @@
 在 Jetson 的系统 Python 环境执行。JetPack 提供的 PyTorch、CUDA、TensorRT 和 OpenCV 不要用 pip 替换；仅安装项目固定的 Ultralytics 版本：
 
 ```bash
-python3 -m pip install --no-deps -r models/YOLO26n-CLS/requirements.txt
+python3 -m pip install --no-deps -r models/YOLO26n-CLS/v1/requirements.txt
 
 cd models/YOLO26n-CLS/v1/01_model_train
 python3 01-download_weights.py
