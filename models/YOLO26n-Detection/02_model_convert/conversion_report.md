@@ -19,9 +19,11 @@ YOLO26n 的检测头接收三个尺度的特征图，所以不能像分类模型
 | 子图 | 输入 | 输出 |
 |---|---|---|
 | `yolo26n_backbone_neck.onnx` | `images` FP32 `[1,3,640,640]` | `p3` `[1,64,80,80]`、`p4` `[1,128,40,40]`、`p5` `[1,256,20,20]` |
-| `yolo26n_detect_head.onnx` | `p3`、`p4`、`p5` | `predictions` FP32 `[1,300,6]` |
+| `yolo26n_detect_head.onnx` | `p3`、`p4`、`p5` | `predictions` FP32 `[1,84,8400]` 原始输出：4 个 box 通道、80 个类别通道、8400 个候选位置 |
 
-边界来自 YOLO26n 结构：`model[0:23]` 包含骨干网络和 Neck，最终 Detect 层是 `model[23]`；Detect 从 `model[16]`、`model[19]`、`model[22]` 读取 P3/P4/P5。脚本 `03-onnx_slice.py` 会在导出前比较完整 PyTorch 模型与切分模型的输出，并检查特征图和检测输出形状。按本次“只写逻辑、不运行代码”的要求，切分 ONNX 尚未生成或实测；需在目标环境运行该脚本后再记录实际误差和文件大小。
+边界来自 YOLO26n 结构：`model[0:23]` 包含骨干网络和 Neck，最终 Detect 层是 `model[23]`；Detect 从 `model[16]`、`model[19]`、`model[22]` 读取 P3/P4/P5。直接导出这个 checkpoint 的 Detect 模块时，`end2end=False`，所以它返回 `[1,84,8400]` 原始候选；这正是脚本实际得到的 shape，原来的 `[1,300,6]` 检查值不适用于这个切分点。脚本 `03-onnx_slice.py` 会比较完整 PyTorch forward 与切分后的 raw Detect 输出，并检查 P3/P4/P5 和 Detect 原始输出 shape。
+
+完整部署 ONNX 当前为 `[1,300,6]`，其图中还包含 TopK/GatherElements 等候选筛选节点；它不是上表中的 raw Detect 切分输出。切分图用于观察 backbone/Neck 与 Detect 的边界，不能直接把 raw head 输出当成完整 ONNX 输出。当前部署仍走完整 ONNX → TensorRT 主路径。按本次“只写逻辑、不运行代码”的要求，修正后的切分脚本尚未重新运行；需在目标环境运行后记录实际误差和切分 ONNX 文件大小。
 
 切分图用于明确模块边界和后续复用，不改变当前完整 ONNX → TensorRT engine → C++ demo 主路径；本次不单独构建 backbone/head TensorRT engines。
 

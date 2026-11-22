@@ -1,4 +1,4 @@
-"""Export YOLO26n's backbone+neck and Detect module as separate ONNX graphs."""
+"""Export YOLO26n's backbone+neck and raw Detect module as separate ONNX graphs."""
 
 from pathlib import Path
 
@@ -81,8 +81,11 @@ with torch.inference_mode():
     actual_feature_shapes = [tuple(feature.shape) for feature in features]
     if actual_feature_shapes != feature_shapes:
         raise RuntimeError("P3/P4/P5 shape 变化：{}".format(actual_feature_shapes))
-    if tuple(split_output.shape) != (1, 300, 6):
-        raise RuntimeError("Detect head 输出 shape 变化：{}".format(tuple(split_output.shape)))
+    expected_detect_shape = (1, 84, 8400)  # 4 个 box 通道 + 80 个类别通道，8400 个候选位置
+    if tuple(full_output.shape) != expected_detect_shape:
+        raise RuntimeError("完整 PyTorch Detect 原始输出 shape 变化：{}".format(tuple(full_output.shape)))
+    if tuple(split_output.shape) != expected_detect_shape:
+        raise RuntimeError("切分 Detect 原始输出 shape 变化：{}".format(tuple(split_output.shape)))
     max_error = (full_output - split_output).abs().max().item()
     if not torch.allclose(full_output, split_output, rtol=1e-5, atol=1e-5):
         raise RuntimeError("完整模型与切分模型输出不一致，最大绝对误差：{:.8g}".format(max_error))
@@ -91,7 +94,7 @@ print("切分点：YOLO26n model[23] Detect 之前")
 print("特征提取段：model[0:23]（骨干网络 + Neck）")
 for name, index, shape in zip(feature_names, detect_inputs, actual_feature_shapes):
     print("Detect 输入 {} <- model[{}]，shape={}".format(name, index, shape))
-print("Detect head 输出：{}，完整模型与切分模型最大绝对误差：{:.8g}".format(
+print("Detect head 原始输出：{}（4+80 个通道 × 8400 个候选），完整模型与切分模型最大绝对误差：{:.8g}".format(
     tuple(split_output.shape), max_error
 ))
 

@@ -27,6 +27,8 @@
 !models/YOLO26n-Detection/05_model_demo/v1/models/yolo26n_fp16.engine
 
 # Local datasets and generated experiment outputs
+models/MobileNetV3-Small/05_model_demo/baseline/build/
+models/MobileNetV3-Small/05_model_demo/v1/build/
 **/datasets/
 **/data/raw/
 **/data/processed/
