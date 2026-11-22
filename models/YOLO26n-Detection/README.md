@@ -1,14 +1,10 @@
-# YOLO26n 目标检测部署流程
+# YOLO26n 目标检测模型流程
 
-本目录按 MicroZoo 的五阶段流程实现 D-01：官方 YOLO26n COCO 预训练模型、完整 ONNX 与 backbone+Neck / Detect head 切分 ONNX、Jetson TensorRT FP16、数值与任务验证、目标硬件剖析，以及 TensorRT C++ 检测 demo。
+模型编号：`D-01`。当前交付为基础 `v1`：下载官方 COCO 预训练权重，导出并切分 ONNX，在 Jetson 上构建 FP16 TensorRT engine，再验证 PyTorch、ONNX 和 engine。当前不做项目数据微调、量化、CUDA Graph 或算子优化。
 
-当前使用官方预训练权重，**没有针对本项目数据微调**。32 张 COCO 2017 `val2017` 图片用于检查流程、转换回归和 demo，不是完整 COCO 验证集，不能据此宣称完整 COCO mAP。
+32 张 COCO 2017 `val2017` 图片只用于流程回归，不代表完整 COCO mAP。环境记录见 [`environment.md`](environment.md)。
 
-## 环境
-
-本次实测环境见 [environment.md](environment.md)。代码使用系统 Python 和 JetPack 提供的 PyTorch / CUDA / TensorRT，不要用 pip 替换 Jetson 系统运行时。
-
-## 从仓库根目录复现
+## 按阶段复现
 
 ```bash
 cd models/YOLO26n-Detection/01_model_train
@@ -26,26 +22,25 @@ python3 05-build_tensorrt.py
 
 cd ../03_model_validate
 python3 01-numerical-validate.py
+python3 02-task-validate.py
 bash 03-memory-validation.sh
+```
 
-cd ../04_model_optimize/baseline
-python3 01-compare.py
-python3 02-bench.py
-bash 03-nsight.sh
-python3 04-repeat_bench.py
+stage 02 会导出完整 ONNX 以及用于结构学习的 backbone+Neck/head 切分 ONNX；部署 engine 从完整 ONNX 构建。checkpoint、数据集和中间文件是本地产物，按 `.gitignore` 管理。
 
-cd ../v1
-python3 01-bench-cudagraph.py
+## 04 优化阶段
 
-cd ../../05_model_demo/baseline
-python3 00-prepare_assets.py
+本版不运行性能 profiling、CUDA Graph、量化或算子优化。此阶段以后用于算子效率改进和自定义 TensorRT Plugin。
+
+## 05 构建基础 C++ Demo
+
+```bash
+cd models/YOLO26n-Detection/05_model_demo/v1
+mkdir -p models
+cp ../../02_model_convert/engine/yolo26n_fp16.engine models/
 cmake -S . -B build
 cmake --build build -j2
 ./build/yolo26n_demo
 ```
 
-模型权重与样本数据由单独脚本显式准备；推理、转换和验证脚本都只读本地文件，不会在运行中暗中下载。COCO subset 准备器从 COCO 官方 2017 val 标注中使用固定随机种子 `20261121` 选出 32 张图片，生成 YOLO 格式边界框、类别映射、`data.yaml` 和 `selection.txt`。完整原始标注包在准备时临时下载并删除；最终目录只保留选中的小型数据子集。
-
-每阶段的脚本、指标和报告位于对应目录。TensorRT engine 与 checkpoint 是目标设备生成的本地二进制文件，按仓库规则忽略；demo 的运行目录要求将 stage 02 生成的 engine 复制到 `05_model_demo/baseline/models/`。
-
-阶段 04 的数据解读见 [baseline analysis](04_model_optimize/baseline/baseline_analysis.md)、[optimization summary](04_model_optimize/v1/stage_report.md) 和 [V1 CUDA Graph report](04_model_optimize/v1/optimization_report.md)。阶段 05 的摄像头构建与实测见 [demo report](05_model_demo/baseline/demo_report.md)。
+Demo 对固定 `assets/sample.jpg` 做一次检测：OpenCV CPU 完成 letterbox，TensorRT 执行 engine，C++ 在 CPU 上进行置信度过滤和 NMS，然后打印检测框。它不依赖摄像头、用户界面或自定义 CUDA 核。engine 应在目标 Jetson/TensorRT 环境中构建。

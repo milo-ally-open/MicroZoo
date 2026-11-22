@@ -10,8 +10,6 @@ SELECTION_FILE="${DATA_DIR}/imagenette2-small/selection.txt"
 SAMPLE_COPIES=(
     "${SCRIPT_DIR}/sample.jpg"
     "${SCRIPT_DIR}/../03_model_validate/sample.jpg"
-    "${SCRIPT_DIR}/../04_model_optimize/baseline/sample.jpg"
-    "${SCRIPT_DIR}/../05_model_demo/baseline/assets/sample.jpg"
     "${SCRIPT_DIR}/../05_model_demo/v1/assets/sample.jpg"
 )
 

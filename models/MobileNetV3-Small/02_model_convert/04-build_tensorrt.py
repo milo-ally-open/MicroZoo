@@ -4,10 +4,12 @@ from time import perf_counter
 import tensorrt as trt
 
 project_dir = Path(__file__).resolve().parent
-onnx_path = project_dir / "onnx" / "mobilenet_v3_small_backbone.onnx"
+onnx_path = project_dir / "onnx" / "mobilenet_v3_small.onnx"
 engine_dir = project_dir / "engine"
-engine_path = engine_dir / "mobilenet_v3_small_backbone.engine"
+engine_path = engine_dir / "mobilenet_v3_small_fp16.engine"
 engine_dir.mkdir(parents=True, exist_ok=True)
+if not onnx_path.is_file():
+    raise FileNotFoundError("先运行 01-export_onnx.py")
 
 print("TensorRT 版本：{}".format(trt.__version__), flush=True)
 print("ONNX 文件：{} ({:.2f} MiB)".format(onnx_path, onnx_path.stat().st_size / 1024 ** 2), flush=True)

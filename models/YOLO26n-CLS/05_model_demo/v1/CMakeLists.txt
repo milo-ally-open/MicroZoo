@@ -1,14 +1,11 @@
 cmake_minimum_required(VERSION 3.18)
-project(yolo26n_cls_v1 LANGUAGES CXX CUDA)
+project(yolo26n_cls_v1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CUDA_STANDARD 17)
-set(CMAKE_CUDA_STANDARD_REQUIRED ON)
-
 find_package(CUDAToolkit REQUIRED)
-find_package(OpenCV REQUIRED COMPONENTS core imgcodecs)
+find_package(OpenCV REQUIRED COMPONENTS core imgcodecs imgproc)
 find_path(TENSORRT_INCLUDE_DIR NvInfer.h
     PATHS /usr/include/aarch64-linux-gnu /usr/include /usr/local/include
     REQUIRED
@@ -18,7 +15,6 @@ find_library(TENSORRT_LIBRARY nvinfer
     REQUIRED
 )
 
-add_executable(yolo26n_cls_v1_demo src/main.cpp kernel/preprocess.cu)
-set_target_properties(yolo26n_cls_v1_demo PROPERTIES CUDA_ARCHITECTURES 87)
-target_include_directories(yolo26n_cls_v1_demo PRIVATE include ${TENSORRT_INCLUDE_DIR} ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(yolo26n_cls_v1_demo PRIVATE ${TENSORRT_LIBRARY} CUDA::cudart ${OpenCV_LIBS})
+add_executable(yolo26n_cls_demo src/main.cpp)
+target_include_directories(yolo26n_cls_demo PRIVATE include ${TENSORRT_INCLUDE_DIR} ${OpenCV_INCLUDE_DIRS})
+target_link_libraries(yolo26n_cls_demo PRIVATE ${TENSORRT_LIBRARY} CUDA::cudart ${OpenCV_LIBS})

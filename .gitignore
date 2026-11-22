@@ -14,20 +14,7 @@
 *.rknn
 *.gguf
 
-# Required runtime asset for the baseline MobileNetV3-Small demo.
-!models/MobileNetV3-Small/05_model_demo/baseline/models/mobilenet_v3_small_fp16.engine
-!models/MobileNetV3-Small/05_model_demo/v1/models/mobilenet_v3_small_fp16.engine
-
-# Required runtime assets for the YOLO26n-cls demos.
-!models/YOLO26n-CLS/05_model_demo/baseline/models/yolo26n-cls_fp16.engine
-!models/YOLO26n-CLS/05_model_demo/v1/models/yolo26n-cls_fp16.engine
-
-# Required runtime assets for the YOLO26n detection demos.
-!models/YOLO26n-Detection/05_model_demo/baseline/models/yolo26n_fp16.engine
-!models/YOLO26n-Detection/05_model_demo/v1/models/yolo26n_fp16.engine
-
 # Local datasets and generated experiment outputs
-models/MobileNetV3-Small/05_model_demo/baseline/build/
 models/MobileNetV3-Small/05_model_demo/v1/build/
 **/datasets/
 **/data/raw/

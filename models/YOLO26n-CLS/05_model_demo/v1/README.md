@@ -1,11 +1,15 @@
-# YOLO26n-cls TensorRT C++ V1 Demo
+# YOLO26n-cls TensorRT C++ v1 Demo
 
-V1 与 `../baseline` 使用相同的 engine、测试图片、CUDA 预处理 kernel 和 OpenCV 预处理路径。每个测试函数先进行 10 次 eager warmup，再使用固定输入输出缓冲区 capture TensorRT engine 执行，并通过 CUDA Graph replay 完成计时和最终分类。
+该 Demo 对固定 `assets/sample.jpg` 做一次图像分类。OpenCV 在 CPU 上完成短边缩放、中心裁剪、RGB 转换和 `[0,1]` 缩放；TensorRT 执行一次 FP16 engine 推理并输出 Top-1/Top-5。没有自定义 CUDA 预处理、重复计时或 CUDA Graph。
+
+## 构建与运行
+
+在 Jetson 上准备 TensorRT、CUDA Toolkit/runtime、OpenCV 4、CMake 和 C++17 编译器，从本目录执行：
 
 ```bash
 cmake -S . -B build
 cmake --build build -j2
-./build/yolo26n_cls_v1_demo
+./build/yolo26n_cls_demo
 ```
 
-输出包含两种预处理路径的 Top-1、预处理耗时、engine 推理耗时和端到端耗时。Graph 只包含 TensorRT 执行，不捕获图像预处理或主机/设备数据传输。比较 baseline 和 V1 时使用同一设备状态与测试图。两者使用同一个 engine；变化仅在运行时提交方式，模型权重和精度保持一致。
+程序从当前目录读取 `models/yolo26n-cls_fp16.engine`、`assets/sample.jpg` 和 `assets/imagenet_classes.txt`。engine 由 `02_model_convert/04-build_tensorrt.py` 从完整 ONNX 构建；更换 Jetson 或 TensorRT 版本时应重新构建。

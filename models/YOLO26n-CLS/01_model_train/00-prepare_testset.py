@@ -37,8 +37,6 @@ sample_image = output_dir / "n01440764" / sorted(path.name for path in (output_d
 for destination in [
     project_dir / "sample.jpg",
     project_dir.parent / "03_model_validate" / "sample.jpg",
-    project_dir.parent / "04_model_optimize" / "baseline" / "sample.jpg",
-    project_dir.parent / "05_model_demo" / "baseline" / "assets" / "sample.jpg",
     project_dir.parent / "05_model_demo" / "v1" / "assets" / "sample.jpg",
 ]:
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -46,4 +44,4 @@ for destination in [
 
 (output_dir.parent / "selection.txt").write_text("\n".join(manifest_lines) + "\n")
 print("Prepared {} images across {} classes".format(len(manifest_lines) - 1, len(classes)))
-print("Fixed sample image copied to each stage workspace: {}".format(sample_image))
+print("Fixed sample image copied to validation and demo: {}".format(sample_image))
