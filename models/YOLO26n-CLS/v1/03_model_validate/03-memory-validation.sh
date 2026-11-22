@@ -6,6 +6,7 @@ MEMORY_DIR="${SCRIPT_DIR}/metrics/memory"
 mkdir -p "${MEMORY_DIR}"
 
 if command -v tegrastats >/dev/null 2>&1; then
+    : > "${MEMORY_DIR}/tegrastats.log"
     tegrastats --interval 100 --logfile "${MEMORY_DIR}/tegrastats.log" &
     TEGRASTATS_PID=$!
     trap 'kill "${TEGRASTATS_PID}" 2>/dev/null || true; wait "${TEGRASTATS_PID}" 2>/dev/null || true' EXIT

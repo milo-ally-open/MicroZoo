@@ -10,6 +10,7 @@ if ! command -v tegrastats >/dev/null 2>&1; then
     exit 1
 fi
 
+: > "${METRICS_DIR}/tegrastats.log"
 tegrastats --interval 1000 --logfile "${METRICS_DIR}/tegrastats.log" &
 TEGRASTATS_PID=$!
 trap 'kill -TERM "${TEGRASTATS_PID}" 2>/dev/null || true; wait "${TEGRASTATS_PID}" 2>/dev/null || true' EXIT
